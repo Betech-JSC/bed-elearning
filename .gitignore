@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Agent & Workspace
+.agent/
+openspec/
+scratch/
+.gemini/
+.idea/
+.vscode/
+
