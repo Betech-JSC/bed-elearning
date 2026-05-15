@@ -52,7 +52,7 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<LessonFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       title: lesson.title || "",
       description: lesson.description || "",
@@ -112,7 +112,7 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <form onSubmit={form.handleSubmit(onSubmit as any)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white dark:bg-zinc-900 border rounded-2xl p-6 shadow-sm space-y-6">
               <div className="flex items-center gap-2 text-lg font-bold border-b pb-4">
@@ -121,7 +121,7 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
               </div>
               
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="title"
                 render={({ field }) => (
                   <FormItem>
@@ -135,7 +135,7 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
               />
 
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
@@ -159,7 +159,7 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
                 </div>
 
                 <FormField
-                  control={form.control}
+                  control={form.control as any}
                   name="videoUrl"
                   render={({ field }) => (
                     <FormItem>
@@ -211,7 +211,7 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form.control as any}
                   name="isFreePreview"
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between rounded-xl border p-4 bg-zinc-50/50">

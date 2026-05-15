@@ -28,9 +28,7 @@ interface EditorProps {
 export const Editor = ({ onChange, value }: EditorProps) => {
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        history: true,
-      }),
+      StarterKit,
       Underline,
       Link.configure({
         openOnClick: false,
