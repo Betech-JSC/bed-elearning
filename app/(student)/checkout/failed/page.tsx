@@ -1,12 +1,13 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { XCircle, RefreshCcw, HelpCircle } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
-export default function FailedPage() {
+function FailedContent() {
   const searchParams = useSearchParams()
   const code = searchParams.get("code")
   const message = searchParams.get("message")
@@ -41,5 +42,13 @@ export default function FailedPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function FailedPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center">Đang tải...</div>}>
+      <FailedContent />
+    </Suspense>
   )
 }

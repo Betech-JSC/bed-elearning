@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -28,7 +28,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   // Ensure we safely handle useSearchParams (this should be wrapped in Suspense if necessary but Next.js handles it at client component level in many cases, 
   // but to prevent build warnings, we might need Suspense if deployed to edge. For now it's fine).
@@ -159,5 +159,13 @@ export default function LoginPage() {
         </div>
       </CardFooter>
     </Card>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]">Đang tải...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }

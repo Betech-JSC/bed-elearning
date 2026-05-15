@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useCart } from "@/lib/store/use-cart"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -8,7 +8,7 @@ import { CheckCircle2, ArrowRight, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
-export default function SuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get("orderId")
   const { clearCart } = useCart()
@@ -45,5 +45,13 @@ export default function SuccessPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center">Đang tải...</div>}>
+      <SuccessContent />
+    </Suspense>
   )
 }
