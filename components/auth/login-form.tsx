@@ -147,7 +147,7 @@ export const LoginForm = ({
                 <FormItem className="space-y-1">
                   <div className="flex items-center justify-between">
                     <FormLabel className="text-xs font-black uppercase text-zinc-500">Mật khẩu</FormLabel>
-                    <Link href="/forgot-password" size="sm" className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-tight">
+                    <Link href="/forgot-password" className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-tight">
                       Quên mật khẩu?
                     </Link>
                   </div>
