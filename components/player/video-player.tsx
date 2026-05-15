@@ -10,8 +10,8 @@ import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 interface VideoPlayerProps {
-  courseId: string
-  lessonId: string
+  courseId?: string
+  lessonId?: string
   videoUrl: string
   initialTime?: number
   onComplete?: () => void
@@ -44,7 +44,7 @@ export function VideoPlayer({
         currentTime = player?.currentTime || 0
       }
 
-      if (currentTime > 0) {
+      if (currentTime > 0 && courseId && lessonId) {
         try {
           await fetch(`/api/courses/${courseId}/lessons/${lessonId}/progress`, {
             method: "POST",
@@ -60,16 +60,18 @@ export function VideoPlayer({
   }, [isReady, courseId, lessonId, isYoutube, isMux])
 
   const handleEnded = async () => {
-    try {
-      await fetch(`/api/courses/${courseId}/lessons/${lessonId}/progress`, {
-        method: "POST",
-        body: JSON.stringify({ isCompleted: true })
-      })
-      toast.success("Bài học đã hoàn thành!")
-      if (onComplete) onComplete()
-    } catch (error) {
-      toast.error("Không thể cập nhật tiến độ bài học.")
+    if (courseId && lessonId) {
+      try {
+        await fetch(`/api/courses/${courseId}/lessons/${lessonId}/progress`, {
+          method: "POST",
+          body: JSON.stringify({ isCompleted: true })
+        })
+        toast.success("Bài học đã hoàn thành!")
+      } catch (error) {
+        toast.error("Không thể cập nhật tiến độ bài học.")
+      }
     }
+    if (onComplete) onComplete()
   }
 
   return (
