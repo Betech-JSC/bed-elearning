@@ -148,7 +148,10 @@ export default async function LessonPage({
                   ) : <div className="w-24" />}
                </div>
 
-               <form action={completeLesson.bind(null, lesson.id)}>
+               <form action={async () => {
+                  "use server"
+                  await completeLesson(lesson.id)
+               }}>
                   <Button 
                     type="submit"
                     className={cn(
