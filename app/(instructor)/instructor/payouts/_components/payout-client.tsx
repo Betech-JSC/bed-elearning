@@ -131,11 +131,11 @@ export const PayoutClient = ({
               <div key={p.id} className="flex items-center justify-between p-4 border rounded-xl bg-zinc-50 dark:bg-zinc-900">
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center
-                    ${p.status === "COMPLETED" ? "bg-emerald-100 text-emerald-600" : 
+                    ${p.status === "PAID" ? "bg-emerald-100 text-emerald-600" : 
                       p.status === "FAILED" ? "bg-red-100 text-red-600" : 
                       "bg-amber-100 text-amber-600"}
                   `}>
-                    {p.status === "COMPLETED" && <CheckCircle className="w-5 h-5" />}
+                    {p.status === "PAID" && <CheckCircle className="w-5 h-5" />}
                     {p.status === "FAILED" && <XCircle className="w-5 h-5" />}
                     {p.status === "PENDING" && <Clock className="w-5 h-5" />}
                   </div>
@@ -146,7 +146,7 @@ export const PayoutClient = ({
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium">
-                    {p.status === "PENDING" ? "Đang chờ xử lý" : p.status === "COMPLETED" ? "Thành công" : "Bị từ chối"}
+                    {p.status === "PENDING" ? "Đang chờ xử lý" : p.status === "PAID" ? "Thành công" : "Bị từ chối"}
                   </p>
                   <p className="text-xs text-zinc-500 max-w-[200px] truncate">{p.bankInfo}</p>
                 </div>

@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { getInstructorBalance } from "@/lib/revenue"
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
@@ -13,15 +14,20 @@ export async function POST(req: Request) {
 
     const { amount, bankInfo } = await req.json()
 
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ message: "Số tiền không hợp lệ" }, { status: 400 })
+    if (!amount || amount < 100000) {
+      return NextResponse.json({ message: "Số tiền rút tối thiểu là 100.000đ" }, { status: 400 })
     }
 
     if (!bankInfo || typeof bankInfo !== "string" || bankInfo.trim() === "") {
       return NextResponse.json({ message: "Vui lòng cung cấp thông tin ngân hàng" }, { status: 400 })
     }
 
-    // BUG-06 FIX: bankInfo is now a valid field in the schema
+    // Verify balance
+    const { availableBalance } = await getInstructorBalance(session.user.id)
+    if (amount > availableBalance) {
+      return NextResponse.json({ message: "Số dư không đủ để thực hiện yêu cầu này" }, { status: 400 })
+    }
+
     const payout = await prisma.payout.create({
       data: {
         instructorId: session.user.id,

@@ -14,7 +14,7 @@ interface AdminPayoutClientProps {
 export const AdminPayoutClient = ({ payouts }: AdminPayoutClientProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedPayout, setSelectedPayout] = useState<string | null>(null)
-  const [remarks, setRemarks] = useState("")
+  const [remarks, setRemarks] = useState("") // Keeping state name as remarks for now but mapping to notes in API
   const router = useRouter()
 
   const onUpdateStatus = async (id: string, status: string) => {
@@ -23,7 +23,7 @@ export const AdminPayoutClient = ({ payouts }: AdminPayoutClientProps) => {
       const res = await fetch(`/api/admin/payouts/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, remarks })
+        body: JSON.stringify({ status, notes: remarks })
       })
 
       if (!res.ok) throw new Error("Lỗi mạng")
@@ -62,7 +62,7 @@ export const AdminPayoutClient = ({ payouts }: AdminPayoutClientProps) => {
                 <td className="py-4">{new Date(p.createdAt).toLocaleDateString("vi-VN")}</td>
                 <td className="py-4">
                   <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase
-                    ${p.status === "COMPLETED" ? "bg-emerald-100 text-emerald-700" : 
+                    ${p.status === "PAID" ? "bg-emerald-100 text-emerald-700" : 
                       p.status === "FAILED" ? "bg-red-100 text-red-700" : 
                       "bg-amber-100 text-amber-700"}
                   `}>
@@ -80,7 +80,7 @@ export const AdminPayoutClient = ({ payouts }: AdminPayoutClientProps) => {
                             value={remarks}
                             onChange={(e) => setRemarks(e.target.value)}
                           />
-                          <Button onClick={() => onUpdateStatus(p.id, "COMPLETED")} size="sm" className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700">Duyệt</Button>
+                          <Button onClick={() => onUpdateStatus(p.id, "PAID")} size="sm" className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700">Duyệt</Button>
                           <Button onClick={() => onUpdateStatus(p.id, "FAILED")} size="sm" variant="destructive" className="h-7 text-xs">Từ chối</Button>
                           <Button onClick={() => setSelectedPayout(null)} size="sm" variant="ghost" className="h-7 text-xs">Hủy</Button>
                         </div>
@@ -91,7 +91,7 @@ export const AdminPayoutClient = ({ payouts }: AdminPayoutClientProps) => {
                       )}
                     </div>
                   )}
-                  {p.status !== "PENDING" && <span className="text-xs text-zinc-500">{p.remarks || "Không có ghi chú"}</span>}
+                  {p.status !== "PENDING" && <span className="text-xs text-zinc-500">{p.notes || "Không có ghi chú"}</span>}
                 </td>
               </tr>
             ))}

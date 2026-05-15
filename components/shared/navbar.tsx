@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, BookOpen } from "lucide-react"
+import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, BookOpen, ShieldCheck } from "lucide-react"
 import { useCart } from "@/hooks/use-cart"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
@@ -49,7 +49,7 @@ export function Navbar() {
     )}>
       <div className="max-w-7xl mx-auto px-4 w-full flex items-center justify-between">
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 group">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
              <BookOpen className="w-6 h-6" />
           </div>
@@ -107,12 +107,18 @@ export function Navbar() {
                     <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-2xl border-zinc-100 dark:border-zinc-800">
                        <DropdownMenuLabel className="font-black px-3 py-2">Tài khoản</DropdownMenuLabel>
                        <DropdownMenuSeparator />
+                       <DropdownMenuItem className="rounded-xl h-10 px-0 cursor-pointer">
+                          <Link href="/dashboard" className="flex items-center gap-2 w-full h-full px-3">
+                             <LayoutDashboard className="w-4 h-4" />
+                             Bảng điều khiển
+                          </Link>
+                       </DropdownMenuItem>
                        <DropdownMenuItem className="rounded-xl h-10 px-0 cursor-pointer"><Link href="/my-courses" className="flex items-center gap-2 w-full h-full px-3">
                              <BookOpen className="w-4 h-4" />
                              Khóa học của tôi
                           </Link>
                        </DropdownMenuItem>
-                       <DropdownMenuItem className="rounded-xl h-10 px-0 cursor-pointer"><Link href={user.role === "ADMIN" ? "/admin/dashboard" : "/instructor/dashboard"} className="flex items-center gap-2 w-full h-full px-3"><LayoutDashboard className="w-4 h-4" />
+                       <DropdownMenuItem className="rounded-xl h-10 px-0 cursor-pointer"><Link href={user.role === "ADMIN" ? "/admin/dashboard" : "/instructor/dashboard"} className="flex items-center gap-2 w-full h-full px-3"><ShieldCheck className="w-4 h-4" />
                              Trang quản trị
                           </Link></DropdownMenuItem>
                        <DropdownMenuSeparator />

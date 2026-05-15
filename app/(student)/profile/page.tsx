@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import prisma from "@/lib/prisma"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -34,9 +35,18 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
-      <div className="mb-10">
-        <h1 className="text-4xl font-extrabold mb-2">Cài đặt tài khoản</h1>
-        <p className="text-zinc-500">Quản lý thông tin cá nhân và xem lịch sử giao dịch của bạn.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+        <div>
+          <h1 className="text-4xl font-extrabold mb-2">Cài đặt tài khoản</h1>
+          <p className="text-zinc-500">Quản lý thông tin cá nhân và xem lịch sử giao dịch của bạn.</p>
+        </div>
+        {(session?.user?.role === "ADMIN" || session?.user?.role === "INSTRUCTOR") && (
+          <Button asChild variant="outline" className="rounded-xl px-6">
+            <Link href={session?.user?.role === "ADMIN" ? "/admin/dashboard" : "/instructor/dashboard"}>
+              Quay lại trang quản trị
+            </Link>
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-12">

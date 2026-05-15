@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
+import { getInstructorBalance } from "@/lib/revenue"
 import { PayoutClient } from "./_components/payout-client"
 
 export default async function InstructorPayoutsPage() {
@@ -11,33 +12,18 @@ export default async function InstructorPayoutsPage() {
     return redirect("/")
   }
 
-  // Calculate instructor revenue
-  // We'll calculate 70% of all purchased courses where the instructor is the author
-  const paidOrderItems = await prisma.orderItem.findMany({
-    where: {
-      order: { status: "PAID" },
-      course: { instructorId: userId }
-    },
-    include: { course: true }
-  })
-
-  const totalRevenue = paidOrderItems.reduce((acc, item) => acc + (item.price * 0.7), 0)
+  const {
+    totalRevenue,
+    totalPaidOut,
+    totalPending,
+    availableBalance
+  } = await getInstructorBalance(userId)
 
   // Get payout history
   const payouts = await prisma.payout.findMany({
     where: { instructorId: userId },
     orderBy: { createdAt: "desc" }
   })
-
-  const totalPaidOut = payouts
-    .filter(p => p.status === "PAID")
-    .reduce((acc, p) => acc + p.amount, 0)
-    
-  const totalPending = payouts
-    .filter(p => p.status === "PENDING")
-    .reduce((acc, p) => acc + p.amount, 0)
-
-  const availableBalance = totalRevenue - totalPaidOut - totalPending
 
 
   return (

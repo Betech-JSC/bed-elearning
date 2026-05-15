@@ -67,7 +67,7 @@ export default async function AuditLogsPage() {
                   </td>
                   <td className="p-4">
                     <pre className="text-[10px] bg-zinc-100 dark:bg-zinc-900 p-2 rounded-lg max-w-[250px] overflow-x-auto">
-                      {log.details || "-"}
+                      {log.details ? JSON.stringify(log.details, null, 2) : "-"}
                     </pre>
                   </td>
                 </tr>
