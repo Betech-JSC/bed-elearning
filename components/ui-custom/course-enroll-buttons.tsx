@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ShoppingCart, Zap, BookOpen } from "lucide-react"
+import { ShoppingCart, Zap, BookOpen, ArrowRight } from "lucide-react"
 import { useCart } from "@/hooks/use-cart"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -48,8 +48,11 @@ export function CourseEnrollButtons({ course, isEnrolled }: CourseEnrollButtonsP
 
   if (isEnrolled) {
     return (
-      <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 h-14 rounded-2xl font-black text-lg">
-        <Link href={`/learn/${course.slug}`}>Vào học ngay →</Link>
+      <Button asChild className="w-full bg-[#FF6600] hover:bg-orange-600 h-16 rounded-[2rem] font-black text-xs uppercase tracking-widest text-white border-none shadow-xl shadow-orange-500/20">
+        <Link href={`/learn/${course.slug}`} className="flex items-center justify-center gap-2">
+            Vào học ngay
+            <ArrowRight className="w-4 h-4" />
+        </Link>
       </Button>
     )
   }
@@ -58,7 +61,7 @@ export function CourseEnrollButtons({ course, isEnrolled }: CourseEnrollButtonsP
     return (
       <Button
         onClick={handleBuyNow}
-        className="w-full bg-emerald-600 hover:bg-emerald-700 h-14 rounded-2xl font-black text-lg"
+        className="w-full bg-emerald-600 hover:bg-emerald-700 h-16 rounded-[2rem] font-black text-xs uppercase tracking-widest text-white border-none shadow-xl shadow-emerald-500/20"
       >
         Đăng ký miễn phí
       </Button>
@@ -66,35 +69,35 @@ export function CourseEnrollButtons({ course, isEnrolled }: CourseEnrollButtonsP
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <Button
         onClick={handleBuyNow}
-        className="w-full bg-blue-600 hover:bg-blue-700 h-14 rounded-2xl font-black text-lg gap-2"
+        className="w-full bg-[#FF6600] hover:bg-orange-600 h-16 rounded-[2rem] font-black text-xs uppercase tracking-widest text-white border-none shadow-xl shadow-orange-500/20 gap-3 transition-all hover:scale-[1.02] active:scale-95"
       >
-        <Zap className="w-5 h-5" />
+        <Zap className="w-4 h-4 fill-current" />
         Mua ngay
       </Button>
       <Button
         onClick={handleAddToCart}
         variant="outline"
         className={cn(
-          "w-full h-14 rounded-2xl font-black text-lg gap-2 border-2",
+          "w-full h-16 rounded-[2rem] font-black text-xs uppercase tracking-widest gap-3 transition-all border-2",
           isInCart
             ? "border-emerald-400 text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
-            : "border-blue-200 hover:border-blue-400"
+            : "border-zinc-100 hover:border-[#FF6600] hover:bg-orange-50 text-zinc-900"
         )}
       >
-        <ShoppingCart className="w-5 h-5" />
-        {isInCart ? "✓ Đã có trong giỏ hàng" : "Thêm vào giỏ hàng"}
+        <ShoppingCart className="w-4 h-4" />
+        {isInCart ? "Đã trong giỏ hàng" : "Thêm vào giỏ hàng"}
       </Button>
       {isInCart && (
-        <Button
-          asChild
-          variant="ghost"
-          className="w-full h-10 rounded-xl text-sm text-blue-600 font-bold"
+        <Link 
+            href="/checkout" 
+            className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#FF6600] hover:underline pt-2"
         >
-          <Link href="/checkout">Xem giỏ hàng →</Link>
-        </Button>
+            Tiến hành thanh toán
+            <ArrowRight className="w-3 h-3" />
+        </Link>
       )}
     </div>
   )

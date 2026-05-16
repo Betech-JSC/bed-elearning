@@ -7,7 +7,8 @@ import {
   CheckCircle,
   FileText,
   MessageSquare,
-  Info
+  Info,
+  PlayCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -16,6 +17,7 @@ import { completeLesson } from "@/lib/actions/course"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { QnaSection } from "@/components/player/qna-section"
+import { NotesSection } from "@/components/player/notes-section"
 
 export default async function LessonPage({
   params
@@ -83,174 +85,206 @@ export default async function LessonPage({
   const isCompleted = !!lesson.progress[0]?.isCompleted
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-screen bg-[#F8F9FA]">
       {/* TOP HEADER */}
-      <div className="h-16 border-b bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20">
-         <div className="flex items-center gap-4">
+      <div className="h-20 border-b bg-white/80 backdrop-blur-xl px-10 flex items-center justify-between sticky top-0 z-50">
+         <div className="flex items-center gap-6">
             <Link 
                 href={`/courses/${course.slug}`} 
-                className="flex items-center gap-2 group transition-all"
+                className="flex items-center gap-4 group transition-all"
             >
-                <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
-                    <ChevronLeft className="w-4 h-4 text-zinc-500 group-hover:text-blue-600" />
+                <div className="w-10 h-10 rounded-2xl bg-zinc-100 flex items-center justify-center group-hover:bg-orange-50 transition-colors border border-transparent group-hover:border-orange-100">
+                    <ChevronLeft className="w-5 h-5 text-zinc-500 group-hover:text-[#FF6600]" />
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-blue-500 transition-colors">Khóa học</span>
-                    <span className="text-sm font-bold text-zinc-900 dark:text-white line-clamp-1 group-hover:text-blue-600 transition-colors">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-[#FF6600] transition-colors">Danh mục khóa học</span>
+                    <span className="text-sm font-black text-zinc-900 line-clamp-1 group-hover:text-[#FF6600] transition-colors">
                         {course.title}
                     </span>
                 </div>
             </Link>
-            <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-800 mx-2" />
-            <h1 className="font-black text-zinc-900 dark:text-white text-lg line-clamp-1">
-                {lesson.title}
-            </h1>
+            <div className="h-8 w-px bg-zinc-100 mx-2" />
+            <div className="flex flex-col">
+               <span className="text-[10px] font-black uppercase tracking-widest text-[#FF6600]">Bài học hiện tại</span>
+               <h1 className="font-black text-zinc-900 text-sm line-clamp-1">
+                  {lesson.title}
+               </h1>
+            </div>
          </div>
 
-         <div className="flex items-center gap-4">
-            {/* Optional: Add a search icon or settings icon here for "premium" feel */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30">
-                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tighter">Đang học</span>
+         <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-3 px-4 py-2 rounded-xl bg-orange-50 border border-orange-100">
+                <div className="w-2 h-2 rounded-full bg-[#FF6600] animate-pulse" />
+                <span className="text-[10px] font-black text-[#FF6600] uppercase tracking-widest">Đang học</span>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-white border border-zinc-100 shadow-sm flex items-center justify-center text-zinc-400 cursor-pointer hover:text-zinc-900 transition-all">
+                <Info className="w-5 h-5" />
             </div>
          </div>
       </div>
 
-      <div className="flex-1 p-8 space-y-8">
-         {/* VIDEO PLAYER AREA */}
-         <div className="max-w-5xl mx-auto space-y-6">
-            <div className="aspect-video rounded-3xl overflow-hidden bg-black shadow-2xl border border-zinc-200 dark:border-zinc-800 relative group">
-               <VideoPlayer 
-                  videoUrl={lesson.videoUrl || ""} 
-                  lessonId={lesson.id}
-                  courseId={course.id}
-               />
-            </div>
+      <div className="flex flex-1 overflow-hidden">
+        {/* MAIN CONTENT AREA */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-10">
+            <div className="max-w-5xl mx-auto space-y-10 pb-20">
+                {/* VIDEO PLAYER AREA */}
+                <div className="space-y-8">
+                    <div className="aspect-video rounded-[3rem] overflow-hidden bg-black shadow-2xl border border-zinc-100 relative group">
+                        <VideoPlayer 
+                            videoUrl={lesson.videoUrl || ""} 
+                            lessonId={lesson.id}
+                            courseId={course.id}
+                        />
+                    </div>
 
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 py-4">
-               <div className="flex gap-4">
-                  {prevLesson ? (
-                    <Button asChild variant="outline" className="rounded-2xl h-12 px-6 font-bold border-zinc-200 dark:border-zinc-800 gap-2">
-                       <Link href={`/learn/${course.slug}/${prevLesson.id}`}>
-                          <ChevronLeft className="w-4 h-4" />
-                          Trước
-                       </Link>
-                    </Button>
-                  ) : <div className="w-24" />}
-                  
-                  {nextLesson ? (
-                    <Button asChild variant="outline" className="rounded-2xl h-12 px-6 font-bold border-zinc-200 dark:border-zinc-800 gap-2">
-                       <Link href={`/learn/${course.slug}/${nextLesson.id}`}>
-                          Tiếp theo
-                          <ChevronRight className="w-4 h-4" />
-                       </Link>
-                    </Button>
-                  ) : <div className="w-24" />}
-               </div>
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div className="flex gap-4">
+                            {prevLesson ? (
+                                <Button asChild variant="outline" className="rounded-2xl h-14 px-8 font-black border-zinc-200 gap-3 hover:bg-white hover:text-[#FF6600] hover:border-orange-100 transition-all">
+                                    <Link href={`/learn/${course.slug}/${prevLesson.id}`}>
+                                        <ChevronLeft className="w-5 h-5" />
+                                        Bài trước
+                                    </Link>
+                                </Button>
+                            ) : <div className="w-32" />}
+                            
+                            {nextLesson ? (
+                                <Button asChild variant="outline" className="rounded-2xl h-14 px-8 font-black border-zinc-200 gap-3 hover:bg-white hover:text-[#FF6600] hover:border-orange-100 transition-all">
+                                    <Link href={`/learn/${course.slug}/${nextLesson.id}`}>
+                                        Bài tiếp theo
+                                        <ChevronRight className="w-5 h-5" />
+                                    </Link>
+                                </Button>
+                            ) : <div className="w-32" />}
+                        </div>
 
-               <form action={async () => {
-                  "use server"
-                  await completeLesson(lesson.id)
-               }}>
-                  <Button 
-                    type="submit"
-                    className={cn(
-                        "rounded-2xl h-12 px-8 font-black text-lg gap-2 shadow-lg transition-all active:scale-95",
-                        isCompleted ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20" : "bg-blue-600 hover:bg-blue-700 shadow-blue-600/20"
+                        <form action={async () => {
+                            "use server"
+                            await completeLesson(lesson.id)
+                        }}>
+                            <Button 
+                                type="submit"
+                                className={cn(
+                                    "rounded-[1.5rem] h-14 px-10 font-black text-sm gap-3 shadow-2xl transition-all active:scale-95 uppercase tracking-widest",
+                                    isCompleted 
+                                        ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20 text-white" 
+                                        : "bg-zinc-900 hover:bg-black shadow-zinc-900/20 text-white"
+                                )}
+                            >
+                                <CheckCircle className={cn("w-5 h-5", isCompleted && "fill-current")} />
+                                {isCompleted ? "Đã hoàn thành" : "Đánh dấu hoàn thành"}
+                            </Button>
+                        </form>
+                    </div>
+                </div>
+
+                {/* CONTENT TABS */}
+                <Tabs defaultValue="description" className="w-full">
+                    <TabsList className="w-full justify-start bg-white rounded-3xl p-2 h-auto gap-2 mb-10 shadow-sm border border-zinc-50">
+                        <TabsTrigger value="description" className="rounded-2xl data-[state=active]:bg-orange-50 data-[state=active]:text-[#FF6600] px-8 py-3 font-black text-xs uppercase tracking-widest transition-all">Tổng quan</TabsTrigger>
+                        <TabsTrigger value="resources" className="rounded-2xl data-[state=active]:bg-orange-50 data-[state=active]:text-[#FF6600] px-8 py-3 font-black text-xs uppercase tracking-widest transition-all">Tài liệu</TabsTrigger>
+                        <TabsTrigger value="qa" className="rounded-2xl data-[state=active]:bg-orange-50 data-[state=active]:text-[#FF6600] px-8 py-3 font-black text-xs uppercase tracking-widest transition-all">Hỏi đáp</TabsTrigger>
+                        <TabsTrigger value="notes" className="rounded-2xl data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600 px-8 py-3 font-black text-xs uppercase tracking-widest transition-all">Ghi chú</TabsTrigger>
+                        {lesson.quiz && (
+                            <TabsTrigger value="quiz" className="rounded-2xl data-[state=active]:bg-purple-50 data-[state=active]:text-purple-600 px-8 py-3 font-black text-xs uppercase tracking-widest transition-all ml-auto">Bài kiểm tra</TabsTrigger>
+                        )}
+                    </TabsList>
+
+                    <TabsContent value="description" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="bg-white p-10 rounded-[2.5rem] border border-zinc-50 shadow-sm">
+                            <h3 className="text-xl font-black text-zinc-900 mb-6 flex items-center gap-3">
+                                <Info className="w-6 h-6 text-[#FF6600]" />
+                                Tổng quan bài học
+                            </h3>
+                            <p className="text-zinc-600 font-medium leading-relaxed">
+                                {lesson.description || "Bài học này chưa có mô tả chi tiết."}
+                            </p>
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="resources" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        {lesson.attachments.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {lesson.attachments.map((file) => (
+                                    <a key={file.id} href={file.url} target="_blank" rel="noreferrer" className="flex items-center gap-5 p-6 bg-white border border-zinc-100 rounded-[2rem] hover:border-orange-200 hover:shadow-xl hover:shadow-orange-500/5 transition-all group">
+                                        <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-[#FF6600] shrink-0 border border-orange-100 shadow-sm group-hover:scale-110 transition-transform">
+                                            <FileText className="w-7 h-7" />
+                                        </div>
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="font-black text-zinc-900 group-hover:text-[#FF6600] transition-colors">{file.name}</span>
+                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Tải file</span>
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="bg-white p-20 rounded-[3rem] border-2 border-dashed border-zinc-100 flex flex-col items-center justify-center text-zinc-400 gap-6">
+                                <FileText className="w-16 h-16 opacity-10" />
+                                <p className="font-black uppercase tracking-widest text-xs">Chưa có tài liệu đính kèm</p>
+                            </div>
+                        )}
+                    </TabsContent>
+
+                    <TabsContent value="qa" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <QnaSection 
+                            lessonId={lesson.id}
+                            questions={lesson.questions}
+                            userId={userId}
+                            courseInstructorId={course.instructorId}
+                            isAdmin={session?.user?.role === "ADMIN"}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="notes" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <NotesSection courseId={course.id} lessonId={lesson.id} />
+                    </TabsContent>
+
+                    {lesson.quiz && (
+                        <TabsContent value="quiz" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                            <div className="bg-white border border-zinc-100 p-12 rounded-[3rem] shadow-sm overflow-hidden relative group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-50 rounded-bl-full -z-0 opacity-50" />
+                                <div className="relative z-10">
+                                    <h3 className="text-3xl font-black mb-2 text-zinc-900">{lesson.quiz.title}</h3>
+                                    <p className="text-zinc-500 font-medium mb-10 max-w-lg leading-relaxed">Bạn cần đạt ít nhất <span className="text-purple-600 font-black">{lesson.quiz.passingScore}%</span> điểm để vượt qua bài kiểm tra này.</p>
+                                    
+                                    {lesson.quiz.questions.length === 0 ? (
+                                        <div className="bg-[#F8F9FA] p-10 rounded-3xl text-center flex flex-col items-center gap-4">
+                                            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                                               <Info className="w-8 h-8 text-zinc-200" />
+                                            </div>
+                                            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Bài kiểm tra đang cập nhật nội dung</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-10">
+                                            <div className="space-y-8">
+                                                {lesson.quiz.questions.map((question, i) => (
+                                                    <div key={question.id} className="bg-[#F8F9FA] p-8 rounded-[2rem] border border-transparent hover:border-purple-100 transition-all space-y-6">
+                                                        <h4 className="font-black text-lg text-zinc-900"><span className="text-purple-600 mr-3">Câu {i + 1}</span>{question.prompt}</h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            {question.options.map(opt => (
+                                                                <div key={opt.id} className="flex items-center gap-4 p-5 bg-white border border-zinc-50 rounded-2xl hover:border-purple-200 hover:shadow-lg hover:shadow-purple-500/5 cursor-pointer transition-all group/opt">
+                                                                    <div className="w-6 h-6 rounded-lg border-2 border-zinc-100 flex-shrink-0 group-hover/opt:border-purple-300 transition-colors" />
+                                                                    <span className="text-sm font-bold text-zinc-600 group-hover/opt:text-zinc-900">{opt.text}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <Button className="rounded-[1.5rem] font-black bg-purple-600 hover:bg-purple-700 h-16 px-12 shadow-xl shadow-purple-500/20 uppercase tracking-widest text-sm">
+                                                Nộp bài
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </TabsContent>
                     )}
-                  >
-                     <CheckCircle className={cn("w-5 h-5", isCompleted && "fill-current")} />
-                     {isCompleted ? "Đã hoàn thành" : "Đánh dấu hoàn thành"}
-                  </Button>
-               </form>
+                </Tabs>
             </div>
+        </div>
 
-            {/* CONTENT TABS */}
-            <Tabs defaultValue="description" className="w-full">
-               <TabsList className="w-full justify-start bg-transparent border-b rounded-none p-0 h-auto gap-8 mb-8">
-                  <TabsTrigger value="description" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-0 py-4 font-bold text-lg">Mô tả</TabsTrigger>
-                  <TabsTrigger value="resources" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-0 py-4 font-bold text-lg">Tài liệu</TabsTrigger>
-                  <TabsTrigger value="qa" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-0 py-4 font-bold text-lg">Hỏi đáp (Q&A)</TabsTrigger>
-                  {lesson.quiz && (
-                    <TabsTrigger value="quiz" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-0 py-4 font-bold text-lg text-purple-600">Bài kiểm tra</TabsTrigger>
-                  )}
-               </TabsList>
 
-               <TabsContent value="description" className="space-y-6">
-                  <div className="flex items-center gap-3 text-zinc-900 dark:text-white font-bold">
-                     <Info className="w-5 h-5 text-blue-500" />
-                     Giới thiệu bài học
-                  </div>
-                  <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed bg-white dark:bg-zinc-950 p-6 rounded-3xl border">
-                     {lesson.description || "Bài giảng này hiện chưa có mô tả chi tiết."}
-                  </p>
-               </TabsContent>
-
-               <TabsContent value="resources" className="space-y-4">
-                  {lesson.attachments.length > 0 ? (
-                    <div className="grid gap-4">
-                      {lesson.attachments.map((file) => (
-                        <a key={file.id} href={file.url} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-4 bg-white dark:bg-zinc-950 border rounded-2xl hover:border-blue-500 transition-all">
-                          <FileText className="w-8 h-8 text-blue-500" />
-                          <div className="font-medium">{file.name}</div>
-                        </a>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="bg-zinc-100 dark:bg-zinc-900/50 p-8 rounded-3xl border-2 border-dashed flex flex-col items-center justify-center text-zinc-500 gap-4">
-                       <FileText className="w-12 h-12 opacity-20" />
-                       <p className="font-medium italic">Không có tài liệu đính kèm cho bài học này.</p>
-                    </div>
-                  )}
-               </TabsContent>
-
-               <TabsContent value="qa" className="space-y-6">
-                   <QnaSection 
-                      lessonId={lesson.id}
-                      questions={lesson.questions}
-                      userId={userId}
-                      courseInstructorId={course.instructorId}
-                      isAdmin={session?.user?.role === "ADMIN"}
-                   />
-               </TabsContent>
-
-               {lesson.quiz && (
-                 <TabsContent value="quiz" className="space-y-6">
-                    <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-900/30 p-8 rounded-3xl">
-                      <h3 className="text-2xl font-black mb-2 text-purple-900 dark:text-purple-100">{lesson.quiz.title}</h3>
-                      <p className="text-purple-700 dark:text-purple-300 mb-6">Bạn cần đạt tối thiểu {lesson.quiz.passingScore}% để qua bài kiểm tra này.</p>
-                      
-                      {lesson.quiz.questions.length === 0 ? (
-                        <div className="bg-white dark:bg-zinc-950 p-6 rounded-2xl text-center text-zinc-500">
-                          Bài kiểm tra này hiện chưa có câu hỏi nào.
-                        </div>
-                      ) : (
-                        <div className="space-y-6">
-                           <div className="space-y-8">
-                             {lesson.quiz.questions.map((question, i) => (
-                               <div key={question.id} className="bg-white dark:bg-zinc-950 p-6 rounded-2xl border space-y-4">
-                                 <h4 className="font-bold text-lg"><span className="text-purple-600 mr-2">Câu {i + 1}:</span>{question.prompt}</h4>
-                                 <div className="space-y-2">
-                                   {question.options.map(opt => (
-                                     <div key={opt.id} className="flex items-center gap-3 p-3 border rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
-                                       <div className="w-5 h-5 rounded-full border-2 border-zinc-300 flex-shrink-0" />
-                                       <span className="text-sm">{opt.text}</span>
-                                     </div>
-                                   ))}
-                                 </div>
-                               </div>
-                             ))}
-                           </div>
-                           <Button className="rounded-xl font-bold bg-purple-600 hover:bg-purple-700 h-12 px-8 w-full">
-                             Nộp bài kiểm tra
-                           </Button>
-                        </div>
-                      )}
-                    </div>
-                 </TabsContent>
-               )}
-            </Tabs>
-         </div>
       </div>
     </div>
   )

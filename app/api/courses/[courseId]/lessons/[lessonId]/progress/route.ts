@@ -31,6 +31,18 @@ export async function PATCH(
       return new NextResponse("Not enrolled", { status: 403 })
     }
 
+    // Check existing progress to prevent duplicate XP
+    const existingProgress = await prisma.progress.findUnique({
+      where: {
+        enrollmentId_lessonId: {
+          enrollmentId: enrollment.id,
+          lessonId: lessonId,
+        },
+      }
+    })
+
+    const wasAlreadyCompleted = existingProgress?.isCompleted || false
+
     // Upsert progress
     const progress = await prisma.progress.upsert({
       where: {
@@ -50,6 +62,14 @@ export async function PATCH(
         currentTime,
       },
     })
+
+    // Award XP if newly completed
+    if (isCompleted && !wasAlreadyCompleted) {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { xp: { increment: 10 } }
+        })
+    }
 
     // Recalculate overall progress if completed
     if (isCompleted) {

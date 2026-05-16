@@ -51,8 +51,8 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const form = useForm<LessonFormValues>({
-    resolver: zodResolver(formSchema) as any,
+  const form = useForm({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       title: lesson.title || "",
       description: lesson.description || "",
@@ -112,7 +112,7 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit as any)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white dark:bg-zinc-900 border rounded-2xl p-6 shadow-sm space-y-6">
               <div className="flex items-center gap-2 text-lg font-bold border-b pb-4">

@@ -3,9 +3,10 @@ import { auth } from "@/lib/auth"
 import { CourseCard } from "@/components/ui-custom/course-card"
 import { CourseFilters } from "@/components/ui-custom/course-filters"
 import { Prisma, CourseLevel } from "@prisma/client"
-import { buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import { Search, SlidersHorizontal, Sparkles } from "lucide-react"
 
 export default async function CoursesPage({
   searchParams,
@@ -27,11 +28,9 @@ export default async function CoursesPage({
     ? (Array.isArray(levelParam) ? levelParam : levelParam.split(",")) 
     : []
   
-  // Validate levels against enum
   const validLevels = ["BEGINNER", "INTERMEDIATE", "ADVANCED", "ALL"]
   const levelsFilter = rawLevels.filter(l => validLevels.includes(l)) as CourseLevel[]
 
-  // Build Prisma Where Clause
   const where: Prisma.CourseWhereInput = {
     status: "PUBLISHED",
     isHidden: false,
@@ -61,7 +60,6 @@ export default async function CoursesPage({
     else if (priceFilter === "over_2m") where.price = { gt: 2000000 }
   }
 
-  // Build Prisma OrderBy
   const validSorts = ["newest", "popular", "price_asc", "price_desc"]
   const activeSort = validSorts.includes(sort) ? sort : "newest"
 
@@ -74,7 +72,6 @@ export default async function CoursesPage({
   const session = await auth()
   const userId = session?.user?.id
 
-  // Execute queries
   const [courses, categories] = await Promise.all([
     prisma.course.findMany({
       where,
@@ -89,70 +86,115 @@ export default async function CoursesPage({
           select: { enrollments: true }
         }
       },
-      take: 24, // MVP pagination limit
+      take: 24,
     }),
     prisma.category.findMany()
   ])
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex flex-col md:flex-row gap-8">
-        
-        {/* Sidebar Filters */}
-        <aside className="w-full md:w-64 shrink-0">
-          <div className="sticky top-20">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">Bộ lọc</h2>
-              {Object.keys(resolvedParams).length > 0 && (
-                <Link href="/courses" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "h-8 text-xs text-blue-600")}>
-                  Xóa bộ lọc
-                </Link>
-              )}
+    <div className="bg-[#F8F9FA] min-h-screen pt-32 pb-24">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header Section */}
+        <div className="mb-16 space-y-4 animate-in fade-in slide-in-from-top-8 duration-1000">
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#FF6600] rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <h1 className="text-5xl font-black tracking-tighter text-zinc-900">Danh mục khóa học</h1>
             </div>
-            <CourseFilters categories={categories} />
-          </div>
-        </aside>
+            <p className="text-zinc-500 font-medium text-lg max-w-2xl leading-relaxed">
+                Khám phá hàng ngàn khóa học chất lượng cao từ các chuyên gia hàng đầu. Bắt đầu hành trình chinh phục tri thức của bạn ngay hôm nay.
+            </p>
+        </div>
 
-        {/* Main Content */}
-        <main className="flex-1">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold">Tất cả khóa học</h1>
-            <p className="text-zinc-500 mt-2">Tìm thấy {courses.length} khóa học phù hợp với tiêu chí của bạn.</p>
-          </div>
-
-          {courses.length === 0 ? (
-            <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700">
-              <div className="w-16 h-16 bg-zinc-200 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+        <div className="flex flex-col lg:grid lg:grid-cols-4 gap-12 items-start">
+          
+          {/* Sidebar Filters */}
+          <aside className="w-full lg:col-span-1 space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000 delay-200 sticky top-28">
+            <div className="bg-white p-8 rounded-[3rem] shadow-xl shadow-zinc-200/50 border border-zinc-100">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                    <SlidersHorizontal className="w-4 h-4 text-zinc-400" />
+                    <h2 className="text-lg font-black text-zinc-900">Bộ lọc</h2>
+                </div>
+                {(Object.keys(resolvedParams).length > 0) && (
+                  <Link href="/courses" className="text-xs font-black text-[#FF6600] hover:underline uppercase tracking-widest">
+                    Đặt lại
+                  </Link>
+                )}
               </div>
-              <h3 className="text-xl font-semibold mb-2">Không tìm thấy kết quả</h3>
-              <p className="text-zinc-500 max-w-md mx-auto mb-6">
-                Rất tiếc, chúng tôi không tìm thấy khóa học nào phù hợp với bộ lọc hiện tại. Vui lòng thử lại với tiêu chí khác.
-              </p>
-              <Link href="/courses" className={buttonVariants()}>
-                Xóa bộ lọc
-              </Link>
+              <CourseFilters categories={categories} />
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map(course => {
-                const totalRating = course.reviews.reduce((acc, rev) => acc + rev.rating, 0)
-                const avgRating = course.reviews.length > 0 ? totalRating / course.reviews.length : 0
-                return (
-                  <CourseCard 
-                    key={course.id} 
-                    course={course} 
-                    rating={avgRating} 
-                    totalStudents={course._count.enrollments}
-                    isMyCourse={course.enrollments && course.enrollments.length > 0}
-                  />
-                )
-              })}
+
+            {/* Promo Card */}
+            <div className="bg-zinc-900 rounded-[3rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-zinc-900/20">
+                <div className="relative z-10 space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400">Ưu đãi hôm nay</p>
+                    <h4 className="text-2xl font-black leading-tight">Giảm đến 50% <br/> cho khóa học mới</h4>
+                    <Button className="w-full h-12 rounded-xl bg-[#FF6600] hover:bg-orange-600 font-black text-xs uppercase tracking-widest border-none text-white">
+                        Xem ngay
+                    </Button>
+                </div>
+                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl" />
             </div>
-          )}
-        </main>
+          </aside>
+
+          {/* Main Content */}
+          <main className="lg:col-span-3 space-y-10 animate-in fade-in slide-in-from-right-8 duration-1000 delay-400">
+            <div className="flex items-center justify-between bg-white px-8 py-5 rounded-[2rem] border border-zinc-100 shadow-sm">
+                <div className="flex items-center gap-4">
+                    <p className="text-sm font-black text-zinc-400 uppercase tracking-widest">Hiển thị:</p>
+                    <span className="text-sm font-black text-zinc-900">{courses.length} khóa học</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 px-4 py-2 bg-zinc-50 rounded-xl">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live Updating</span>
+                    </div>
+                </div>
+            </div>
+
+            {courses.length === 0 ? (
+              <div className="text-center py-32 bg-white rounded-[4rem] border border-dashed border-zinc-200 shadow-sm">
+                <div className="w-24 h-24 bg-orange-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
+                   <Search className="w-10 h-10 text-[#FF6600]" />
+                </div>
+                <h3 className="text-3xl font-black text-zinc-900 mb-3">Không tìm thấy kết quả</h3>
+                <p className="text-zinc-500 max-w-sm mx-auto mb-10 font-medium leading-relaxed">
+                  Chúng tôi không tìm thấy khóa học nào phù hợp với bộ lọc hiện tại của bạn. Vui lòng thử điều chỉnh lại.
+                </p>
+                <Button asChild className="bg-zinc-900 hover:bg-[#FF6600] text-white h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-zinc-200 border-none">
+                   <Link href="/courses">Xóa tất cả bộ lọc</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {courses.map(course => {
+                  const totalRating = course.reviews.reduce((acc, rev) => acc + rev.rating, 0)
+                  const avgRating = course.reviews.length > 0 ? totalRating / course.reviews.length : 5.0
+                  return (
+                    <CourseCard 
+                      key={course.id} 
+                      course={course} 
+                      rating={avgRating} 
+                      totalStudents={course._count.enrollments}
+                      isMyCourse={course.enrollments && course.enrollments.length > 0}
+                    />
+                  )
+                })}
+              </div>
+            )}
+            
+            {/* Pagination Placeholder */}
+            {courses.length >= 24 && (
+                <div className="pt-12 text-center">
+                    <Button variant="outline" className="h-16 px-10 rounded-2xl border-zinc-200 font-black text-xs uppercase tracking-widest hover:bg-zinc-50">
+                        Tải thêm khóa học
+                    </Button>
+                </div>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   )

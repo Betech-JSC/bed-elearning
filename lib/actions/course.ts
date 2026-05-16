@@ -30,12 +30,25 @@ export async function completeLesson(lessonId: string) {
 
   if (!enrollment) throw new Error("Not enrolled")
 
+  const existingProgress = await prisma.progress.findUnique({
+    where: { enrollmentId_lessonId: { enrollmentId: enrollment.id, lessonId } }
+  })
+  const wasAlreadyCompleted = existingProgress?.isCompleted || false
+
   // Upsert progress record
   await prisma.progress.upsert({
     where: { enrollmentId_lessonId: { enrollmentId: enrollment.id, lessonId } },
     update: { isCompleted: true },
     create: { enrollmentId: enrollment.id, lessonId, isCompleted: true }
   })
+
+  // Award XP if newly completed
+  if (!wasAlreadyCompleted) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { xp: { increment: 10 } }
+    })
+  }
 
   // Recalculate overall course progress
   const allLessons = await prisma.lesson.findMany({

@@ -11,8 +11,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Vibecode Academy",
-  description: "Learn Vibe Coding with AI Assistants",
+  title: "Belearning - Nền tảng học tập hiện đại",
+  description: "Học tập không giới hạn với những khóa học chất lượng cao",
 }
 
 export default function RootLayout({

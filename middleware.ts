@@ -10,7 +10,7 @@ export default auth((req) => {
   const role = req.auth?.user?.role
 
   const isOnAdmin = nextUrl.pathname.startsWith("/admin")
-  const isOnInstructor = nextUrl.pathname.startsWith("/instructor")
+  const isOnInstructor = nextUrl.pathname === "/instructor" || nextUrl.pathname.startsWith("/instructor/")
 
   // BUG-19 FIX: Consolidate redirect logic. 
   // Let authorized handle the basic "true/false", but handle specific guest redirects here.

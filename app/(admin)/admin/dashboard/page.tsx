@@ -108,10 +108,12 @@ export default async function AdminDashboardPage() {
   }))
 
   return (
-    <div className="space-y-10">
-      <div>
-        <h1 className="text-4xl font-black mb-2 tracking-tight">Admin Dashboard</h1>
-        <p className="text-zinc-500">Chào mừng quay trở lại. Đây là những gì đang diễn ra trên hệ thống.</p>
+    <div className="space-y-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div>
+           <h1 className="text-5xl font-black tracking-tight text-zinc-900 mb-2">Bảng điều khiển <span className="text-[#FF6600]">Quản trị</span></h1>
+           <p className="text-zinc-500 font-medium">Chào mừng quay trở lại. Theo dõi hoạt động của hệ thống ngay hôm nay.</p>
+        </div>
       </div>
 
       <AdminStatsCards 
@@ -127,7 +129,7 @@ export default async function AdminDashboardPage() {
         }} 
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <AdminRevenueChart data={revenueData} />
         <TopCoursesChart data={topCoursesData} />
       </div>

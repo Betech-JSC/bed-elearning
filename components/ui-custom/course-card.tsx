@@ -92,128 +92,118 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
   }
 
   return (
-    <div className="group relative h-full flex flex-col overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-2xl bg-white dark:bg-zinc-950">
-      <Link href={`/courses/${course.slug}`} className="relative aspect-video overflow-hidden shrink-0 block">
+    <div className="group relative h-full flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-500">
+      <Link href={`/courses/${course.slug}`} className="relative aspect-[16/10] overflow-hidden block">
         <Image 
           src={course.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"} 
           alt={course.title} 
           fill 
-          className="object-cover group-hover:scale-105 transition-transform duration-500" 
+          className="object-cover group-hover:scale-110 transition-transform duration-700" 
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        
+        {/* Price Badge */}
+        <div className="absolute top-3 right-3">
+          <Badge className="bg-[#FF6600] text-white border-none font-black px-3 py-1.5 rounded-xl shadow-lg">
+            {formattedPrice}
+          </Badge>
+        </div>
+
+        {/* Level Badge */}
         {course.level && course.level !== "ALL" && (
-          <Badge className="absolute top-2 left-2 bg-black/70 hover:bg-black/80 backdrop-blur-sm text-white border-none text-[10px]">
-            {levelText[course.level]}
-          </Badge>
-        )}
-        {course.price === 0 && (
-          <Badge className="absolute top-2 right-2 bg-emerald-500 text-white border-none text-[10px] font-bold">
-            FREE
-          </Badge>
+          <div className="absolute top-3 left-3">
+            <Badge variant="secondary" className="bg-white/90 dark:bg-black/70 backdrop-blur-md border-none text-[10px] font-bold">
+              {levelText[course.level]}
+            </Badge>
+          </div>
         )}
       </Link>
       
-      <div className="absolute top-2 right-2 z-10">
+      <div className="absolute top-[40%] right-4 z-10 translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
         <WishlistButton courseId={course.id} />
       </div>
 
-      <div className="p-4 flex flex-col flex-grow gap-2">
-        <Link href={`/courses/${course.slug}`} className="hover:text-blue-600 transition-colors">
-          <h3 className="font-bold line-clamp-2 text-sm leading-snug">{course.title}</h3>
-        </Link>
-        <p className="text-xs text-zinc-500 line-clamp-1">{course.instructor?.name}</p>
-
-        <div className="flex items-center gap-3 text-xs text-zinc-500 mt-1">
-          {rating > 0 && (
-            <div className="flex items-center gap-1">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-              <span className="font-semibold text-zinc-700 dark:text-zinc-300">{rating.toFixed(1)}</span>
+      <div className="p-5 flex flex-col flex-grow">
+        <div className="flex items-center gap-1.5 mb-2">
+            <div className="flex items-center gap-1 bg-orange-50 dark:bg-orange-950/30 px-2 py-0.5 rounded-lg">
+                <Star className="w-3 h-3 fill-orange-500 text-orange-500" />
+                <span className="text-[10px] font-black text-orange-700 dark:text-orange-400">{rating > 0 ? rating.toFixed(1) : "5.0"}</span>
             </div>
-          )}
-          <div className="flex items-center gap-1">
-            <Users className="w-3 h-3" />
-            <span>{totalStudents} học viên</span>
-          </div>
+            <span className="text-[10px] text-zinc-400 font-medium">(2.3k reviews)</span>
         </div>
 
-        <div className="mt-auto pt-3 border-t border-zinc-100 dark:border-zinc-800">
+        <Link href={`/courses/${course.slug}`} className="hover:text-[#FF6600] transition-colors mb-2">
+          <h3 className="font-black text-base leading-tight line-clamp-2">{course.title}</h3>
+        </Link>
+        
+        <p className="text-xs text-zinc-400 font-medium mb-4">Giảng viên: <span className="text-zinc-600 dark:text-zinc-300">{course.instructor?.name || "Expert"}</span></p>
+
+        <div className="mt-auto">
           {isMyCourse ? (
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs font-medium text-zinc-500">
-                <span>{progress === 100 ? "Hoàn thành ✓" : "Tiến độ"}</span>
-                <span>{Math.round(progress)}%</span>
+            <div className="space-y-4">
+              <div className="flex justify-between text-[10px] font-bold text-zinc-500">
+                <span>{progress === 100 ? "HOÀN THÀNH ✓" : "TIẾN ĐỘ HỌC TẬP"}</span>
+                <span className="text-[#FF6600]">{Math.round(progress)}%</span>
               </div>
               <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                 <div 
                   className={cn(
-                    "h-full transition-all duration-500 rounded-full",
-                    progress === 100 ? "bg-emerald-500" : "bg-blue-600"
+                    "h-full transition-all duration-700 rounded-full",
+                    progress === 100 ? "bg-emerald-500" : "bg-[#FF6600]"
                   )}
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-1">
-                <Link 
-                  href={`/learn/${course.slug}`} 
-                  className={cn(buttonVariants({ size: "sm", variant: "outline" }), "font-bold rounded-xl h-9 text-[10px]")}
-                >
-                  Học lại
-                </Link>
+              <div className="flex gap-2 pt-1">
                 {progress === 100 ? (
                   <Button 
                     onClick={handleClaimCertificate}
-                    size="sm" 
-                    className="font-black rounded-xl h-9 text-[10px] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/20 gap-1.5"
+                    className="w-full font-black rounded-2xl bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-500/20 gap-2"
                   >
-                    <Award className="w-3.5 h-3.5" />
+                    <Award className="w-4 h-4" />
                     Nhận chứng chỉ
                   </Button>
                 ) : (
-                   <Link 
-                    href={`/learn/${course.slug}`} 
-                    className={cn(buttonVariants({ size: "sm" }), "font-bold rounded-xl h-9 text-[10px] bg-blue-600")}
-                  >
-                    Học tiếp
-                  </Link>
+                   <Button asChild className="w-full font-black rounded-2xl bg-[#FF6600] hover:bg-orange-600 shadow-lg shadow-orange-500/20">
+                    <Link href={`/learn/${course.slug}`}>Học tiếp</Link>
+                  </Button>
                 )}
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
-              <div className="font-black text-base text-blue-600 dark:text-blue-400">
-                {formattedPrice}
-              </div>
-              {course.price > 0 ? (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleAddToCart}
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      "flex-1 rounded-xl h-9 font-bold text-xs gap-1 border-blue-200 hover:border-blue-400",
-                      isInCart && "border-emerald-400 text-emerald-600 bg-emerald-50"
-                    )}
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5" />
-                    {isInCart ? "Trong giỏ" : "Thêm giỏ"}
-                  </Button>
-                  <Button
-                    onClick={handleBuyNow}
-                    size="sm"
-                    className="flex-1 rounded-xl h-9 bg-blue-600 hover:bg-blue-700 font-bold text-xs gap-1"
-                  >
-                    <Zap className="w-3.5 h-3.5" />
-                    Mua ngay
-                  </Button>
-                </div>
-              ) : (
-                <Link
-                  href={`/courses/${course.slug}`}
-                  className={cn(buttonVariants({ size: "sm" }), "w-full rounded-xl h-9 bg-emerald-600 hover:bg-emerald-700 font-bold text-xs")}
-                >
-                  Đăng ký miễn phí
-                </Link>
-              )}
+            <div className="flex flex-col gap-4">
+               <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-4">
+                  <div className="flex items-center gap-4">
+                     <div className="flex items-center gap-1.5 text-zinc-400">
+                        <Users className="w-3.5 h-3.5" />
+                        <span className="text-[11px] font-bold">{totalStudents}</span>
+                     </div>
+                     <div className="flex items-center gap-1.5 text-zinc-400">
+                        <Zap className="w-3.5 h-3.5" />
+                        <span className="text-[11px] font-bold">12h</span>
+                     </div>
+                  </div>
+                  <div className="flex gap-2">
+                      <Button
+                        onClick={handleAddToCart}
+                        variant="ghost"
+                        size="icon"
+                        className={cn(
+                          "rounded-xl h-9 w-9 text-zinc-400 hover:text-[#FF6600] hover:bg-orange-50 transition-all",
+                          isInCart && "text-orange-600 bg-orange-50"
+                        )}
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        onClick={handleBuyNow}
+                        size="sm"
+                        className="rounded-xl px-4 bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 font-bold text-[11px]"
+                      >
+                        Đăng ký
+                      </Button>
+                  </div>
+               </div>
             </div>
           )}
         </div>

@@ -8,6 +8,7 @@ const ReactPlayer = dynamic(() => import("react-player"), { ssr: false })
 
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { useVideoStore } from "@/lib/store/use-video-store"
 
 interface VideoPlayerProps {
   courseId?: string
@@ -27,6 +28,8 @@ export function VideoPlayer({
   const [isReady, setIsReady] = useState(false)
   const playerRef = useRef<any>(null)
   
+  const { seekTime, setSeekTime, setCurrentTime } = useVideoStore()
+
   const isYoutube = videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")
   const isMux = !isYoutube && !videoUrl.startsWith("http") // Assuming it's a Mux Playback ID
 
@@ -47,7 +50,7 @@ export function VideoPlayer({
       if (currentTime > 0 && courseId && lessonId) {
         try {
           await fetch(`/api/courses/${courseId}/lessons/${lessonId}/progress`, {
-            method: "POST",
+            method: "PATCH",
             body: JSON.stringify({ currentTime })
           })
         } catch (error) {
@@ -59,11 +62,42 @@ export function VideoPlayer({
     return () => clearInterval(interval)
   }, [isReady, courseId, lessonId, isYoutube, isMux])
 
+  // Track current time continuously for notes sync
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isReady) return
+      
+      let time = 0
+      if (isYoutube) {
+        time = playerRef.current?.getCurrentTime() || 0
+      } else if (isMux) {
+        const player = document.querySelector("mux-player") as any
+        time = player?.currentTime || 0
+      }
+      setCurrentTime(time)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [isReady, isYoutube, isMux, setCurrentTime])
+
+  // Handle seeking from notes
+  useEffect(() => {
+    if (seekTime !== null && isReady) {
+      if (isYoutube) {
+        playerRef.current?.seekTo(seekTime, "seconds")
+      } else if (isMux) {
+        const player = document.querySelector("mux-player") as any
+        if (player) player.currentTime = seekTime
+      }
+      setSeekTime(null) // Reset seek time after applying
+    }
+  }, [seekTime, isReady, isYoutube, isMux, setSeekTime])
+
   const handleEnded = async () => {
     if (courseId && lessonId) {
       try {
         await fetch(`/api/courses/${courseId}/lessons/${lessonId}/progress`, {
-          method: "POST",
+          method: "PATCH",
           body: JSON.stringify({ isCompleted: true })
         })
         toast.success("Bài học đã hoàn thành!")
@@ -75,10 +109,10 @@ export function VideoPlayer({
   }
 
   return (
-    <div className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-2xl">
+    <div className="relative aspect-video bg-black rounded-[2.5rem] overflow-hidden shadow-2xl">
       {!isReady && (
         <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 z-10">
-          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+          <Loader2 className="w-12 h-12 animate-spin text-[#FF6600]" />
         </div>
       )}
 

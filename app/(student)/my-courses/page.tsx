@@ -88,7 +88,7 @@ function CourseGrid({ enrollments }: { enrollments: any[] }) {
         <p className="text-zinc-500 max-w-xs mx-auto mb-8">Hãy bắt đầu hành trình học tập bằng cách khám phá các khoá học mới nhất của chúng tôi.</p>
         <a 
           href="/courses" 
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition-all"
+          className="bg-[#FF6600] hover:bg-orange-600 text-white font-black text-sm uppercase tracking-widest py-4 px-10 rounded-2xl transition-all shadow-xl shadow-orange-500/20 inline-block mt-4"
         >
           Khám phá ngay
         </a>

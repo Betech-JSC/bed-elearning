@@ -1,8 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { CheckCircle2, PlayCircle, Lock, ChevronDown, ChevronRight, BookOpen } from "lucide-react"
+import { CheckCircle2, PlayCircle, Lock, ChevronDown, ChevronRight, BookOpen, PanelLeftClose, PanelLeftOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Accordion,
@@ -40,16 +41,40 @@ export function LearningSidebar({
 }: LearningSidebarProps) {
   const params = useParams()
   const activeLessonId = params.lessonId as string
+  const [isCollapsed, setIsCollapsed] = useState(false)
   
   const progressPercentage = Math.round((completedCount / totalCount) * 100) || 0
 
   return (
-    <div className="h-full border-r bg-white dark:bg-zinc-950 flex flex-col w-80 shrink-0 z-30 shadow-xl shadow-zinc-200/50 dark:shadow-none relative">
-      <div className="p-8 border-b space-y-6">
-        <div className="flex items-center justify-between">
-           <h2 className="font-black text-xl tracking-tight">Nội dung</h2>
-           <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full text-zinc-500">{completedCount}/{totalCount} Bài</span>
-        </div>
+    <>
+      {isCollapsed && (
+        <button 
+          onClick={() => setIsCollapsed(false)}
+          className="absolute top-6 left-6 z-50 w-10 h-10 bg-white border border-zinc-200 rounded-xl flex items-center justify-center text-zinc-600 shadow-sm hover:text-blue-600 hover:border-blue-200 transition-all"
+          title="Mở menu"
+        >
+          <PanelLeftOpen className="w-5 h-5" />
+        </button>
+      )}
+      <div className={cn(
+        "h-full border-r bg-white dark:bg-zinc-950 flex flex-col shrink-0 z-40 shadow-xl shadow-zinc-200/50 dark:shadow-none relative transition-all duration-300",
+        isCollapsed ? "w-0 overflow-hidden opacity-0 border-r-0" : "w-80 opacity-100"
+      )}>
+        <div className="w-80 flex flex-col h-full">
+          <div className="p-8 border-b space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                 <h2 className="font-black text-xl tracking-tight">Nội dung</h2>
+                 <button 
+                   onClick={() => setIsCollapsed(true)}
+                   className="w-8 h-8 rounded-full hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-blue-600 transition-colors"
+                   title="Ẩn menu"
+                 >
+                   <PanelLeftClose className="w-4 h-4" />
+                 </button>
+              </div>
+               <span className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full text-zinc-500">{completedCount}/{totalCount} Bài</span>
+            </div>
         <div className="space-y-3">
           <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-zinc-500">
             <span>Tiến độ học tập</span>
@@ -122,12 +147,14 @@ export function LearningSidebar({
         </Accordion>
       </ScrollArea>
       
-      <div className="p-6 bg-zinc-50 dark:bg-zinc-900/50 border-t mt-auto">
-         <Link href={`/courses/${courseSlug}`} className="flex items-center justify-center gap-2 text-xs font-bold text-zinc-500 hover:text-blue-600 transition-colors py-2 group">
-            <BookOpen className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
-            Quay lại tổng quan
-         </Link>
+          <div className="p-6 bg-zinc-50 dark:bg-zinc-900/50 border-t mt-auto">
+             <Link href={`/courses/${courseSlug}`} className="flex items-center justify-center gap-2 text-xs font-bold text-zinc-500 hover:text-blue-600 transition-colors py-2 group">
+                <BookOpen className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+                Quay lại tổng quan
+             </Link>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

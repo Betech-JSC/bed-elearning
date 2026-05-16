@@ -19,6 +19,9 @@ model User {
   bio             String?
   failedAttempts  Int           @default(0)
   lastFailedLogin DateTime?
+  xp              Int           @default(0)
+  streak          Int           @default(0)
+  lastActivityAt  DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   accounts        Account[]
@@ -38,6 +41,7 @@ model User {
   payouts         Payout[]      @relation("InstructorPayouts")
   auditLogs       AuditLog[]
   articles        Article[]
+  notes           Note[]
 }
 
 model Account {
@@ -159,6 +163,7 @@ model Lesson {
   questions     Question[]
   attachments   Attachment[]
   quiz          Quiz?
+  notes         Note[]
 
   @@index([sectionId])
 }
@@ -542,4 +547,20 @@ model Article {
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
+}
+
+// Time-stamped Notes
+model Note {
+  id        String   @id @default(cuid())
+  content   String
+  timestamp Float    @default(0) // Video time in seconds
+  userId    String
+  lessonId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([lessonId])
 }

@@ -44,14 +44,14 @@ function createPrismaClient() {
 
 type PrismaClientExtended = ReturnType<typeof createPrismaClient>
 
-const globalForPrismaExtended = globalThis as unknown as {
+const globalForPrismaExtendedV2 = globalThis as unknown as {
   prisma: PrismaClientExtended | undefined
 }
 
 export const prisma =
-  globalForPrismaExtended.prisma ?? createPrismaClient()
+  globalForPrismaExtendedV2.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== "production")
-  globalForPrismaExtended.prisma = prisma
+  globalForPrismaExtendedV2.prisma = prisma
 
 export default prisma

@@ -38,46 +38,48 @@ export function ProfileForm({ user }: ProfileFormProps) {
       if (!res.ok) throw new Error("Cập nhật thất bại")
       
       await update({ name: formData.name })
-      toast.success("Đã cập nhật thông tin thành công!")
+      toast.success("Profile updated successfully!")
     } catch (error) {
-      toast.error("Đã có lỗi xảy ra.")
+      toast.error("An error occurred.")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6 max-w-2xl">
-      <div className="space-y-2">
-        <Label htmlFor="email">Địa chỉ Email</Label>
-        <Input id="email" value={user.email || ""} disabled className="bg-zinc-50 dark:bg-zinc-900/50" />
-        <p className="text-[10px] text-zinc-500 italic">Email không thể thay đổi vì lý do bảo mật.</p>
+    <form onSubmit={onSubmit} className="space-y-8 max-w-2xl">
+      <div className="space-y-3">
+        <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Email Address</Label>
+        <Input id="email" value={user.email || ""} disabled className="h-14 rounded-2xl border-none bg-[#F8F9FA] px-6 text-sm font-medium opacity-60 cursor-not-allowed" />
+        <p className="text-[10px] text-zinc-400 font-medium italic ml-1">Email cannot be changed for security reasons.</p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="name">Họ và tên</Label>
+      <div className="space-y-3">
+        <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Full Name</Label>
         <Input 
           id="name" 
           value={formData.name} 
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Nhập họ và tên của bạn..."
+          placeholder="Your full name..."
+          className="h-14 rounded-2xl border-none bg-[#F8F9FA] px-6 text-sm font-medium focus-visible:ring-orange-500/20"
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="bio">Tiểu sử</Label>
+      <div className="space-y-3">
+        <Label htmlFor="bio" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Biography</Label>
         <Textarea 
           id="bio" 
           value={formData.bio} 
           onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-          placeholder="Giới thiệu ngắn gọn về bản thân..."
-          rows={5}
+          placeholder="Tell us a bit about yourself..."
+          rows={6}
+          className="rounded-[1.5rem] border-none bg-[#F8F9FA] p-6 text-sm font-medium focus-visible:ring-orange-500/20 resize-none"
         />
       </div>
 
-      <Button type="submit" disabled={isLoading} className="gap-2 bg-blue-600 hover:bg-blue-700">
-        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        Lưu thay đổi
+      <Button type="submit" disabled={isLoading} className="h-14 px-10 rounded-2xl bg-[#FF6600] hover:bg-orange-600 transition-all font-black text-sm uppercase tracking-widest shadow-xl shadow-orange-500/20 gap-3">
+        {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+        Save Changes
       </Button>
     </form>
   )
