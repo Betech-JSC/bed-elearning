@@ -64,7 +64,6 @@ const studentRoutes: SidebarRoute[] = [
   { label: "Chứng chỉ", icon: Award, href: "/certificates" },
   { label: "Bảng xếp hạng", icon: Trophy, href: "/leaderboard" },
   { label: "Hồ sơ", icon: User, href: "/profile" },
-  { label: "Cài đặt", icon: Settings, href: "/settings" },
 ]
 
 export const AppSidebar = ({ role, user }: SidebarProps) => {

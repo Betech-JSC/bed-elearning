@@ -48,20 +48,22 @@ export default async function HomePage() {
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-50 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2 opacity-40" />
 
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-12 animate-in fade-in slide-in-from-left-12 duration-1000">
-            <div className="inline-flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-100 rounded-2xl shadow-sm">
-                <Sparkles className="w-4 h-4 text-[#FF6600]" />
-                <span className="text-[11px] font-black text-[#FF6600] uppercase tracking-[0.2em]">Nền tảng học tập thế hệ mới</span>
+          <div className="space-y-8 animate-in fade-in slide-in-from-left-12 duration-1000">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-100 rounded-2xl shadow-sm">
+                  <Sparkles className="w-4 h-4 text-[#FF6600]" />
+                  <span className="text-[11px] font-black text-[#FF6600] uppercase tracking-[0.2em]">Nền tảng học tập thế hệ mới</span>
+              </div>
+              <h1 className="text-7xl md:text-8xl font-black tracking-tighter leading-[0.95] text-zinc-900">
+                  Khai phá <br/>
+                  <span className="text-[#FF6600]">Tiềm năng</span> <br/>
+                  vô hạn.
+              </h1>
             </div>
-            <h1 className="text-7xl md:text-8xl font-black tracking-tighter leading-[0.95] text-zinc-900">
-                Khai phá <br/>
-                <span className="text-[#FF6600]">Tiềm năng</span> <br/>
-                vô hạn.
-            </h1>
             <p className="text-xl text-zinc-500 max-w-lg leading-relaxed font-medium">
                 Tiếp cận giáo dục đẳng cấp thế giới từ bất cứ đâu. Học cùng chuyên gia, thực hành thực tế và làm chủ tương lai của chính bạn.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 pt-4">
+            <div className="flex flex-col sm:flex-row gap-6 pt-2">
               <Button asChild size="lg" className="bg-[#FF6600] hover:bg-orange-600 h-18 px-12 rounded-[2rem] font-black text-lg shadow-2xl shadow-orange-500/20 transition-all hover:scale-105 text-white border-none">
                 <Link href="/courses" className="flex items-center gap-3">
                     Khám phá ngay
@@ -97,31 +99,9 @@ export default async function HomePage() {
                     src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=80" 
                     alt="Belearning Hero" 
                     width={800} 
-                    height={1000} 
-                    className="w-full h-auto object-cover aspect-[4/5] group-hover:scale-105 transition-transform duration-1000"
+                    height={800} 
+                    className="w-full h-auto object-cover aspect-[4/3] group-hover:scale-105 transition-transform duration-1000"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/40 to-transparent" />
-                
-                {/* Floating Achievement Card */}
-                <div className="absolute top-12 -right-6 bg-white p-6 rounded-[2.5rem] shadow-2xl border border-zinc-50 space-y-4 max-w-[200px] animate-bounce-slow">
-                    <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                        <Award className="w-6 h-6" />
-                    </div>
-                    <p className="font-black text-zinc-900 text-sm leading-tight">Chứng chỉ uy tín quốc tế</p>
-                </div>
-
-                {/* Floating Video Preview */}
-                <div className="absolute bottom-12 -left-12 bg-zinc-900/90 backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl border border-white/10 space-y-4 max-w-[280px]">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-[#FF6600] rounded-full flex items-center justify-center text-white cursor-pointer hover:scale-110 transition-transform">
-                            <Play className="w-5 h-5 fill-current ml-1" />
-                        </div>
-                        <div className="space-y-1">
-                            <p className="text-white font-black text-sm">Xem video giới thiệu</p>
-                            <p className="text-zinc-400 text-[10px] font-bold">2 PHÚT • KHÁM PHÁ</p>
-                        </div>
-                    </div>
-                </div>
              </div>
           </div>
         </div>
@@ -189,9 +169,9 @@ export default async function HomePage() {
       {/* FEATURED COURSES */}
       <section className="py-32 bg-[#F8F9FA] rounded-[5rem] mx-6">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-20 gap-8">
             <div className="space-y-6">
-              <h2 className="text-5xl md:text-6xl font-black tracking-tight text-zinc-900 leading-tight">Khóa học <br/> <span className="text-[#FF6600]">Nổi bật nhất.</span></h2>
+              <h2 className="text-5xl md:text-6xl font-black tracking-tight text-zinc-900 leading-tight">Khóa học <span className="text-[#FF6600]">Nổi bật nhất.</span></h2>
               <p className="text-zinc-500 font-medium text-lg max-w-xl">Học từ những chuyên gia hàng đầu và những giáo trình được kiểm duyệt nghiêm ngặt.</p>
             </div>
             <Link href="/courses" className="h-16 px-10 rounded-full bg-white border border-zinc-100 text-[#FF6600] font-black text-sm flex items-center gap-3 group hover:bg-zinc-900 hover:text-white transition-all shadow-xl shadow-zinc-200/50">

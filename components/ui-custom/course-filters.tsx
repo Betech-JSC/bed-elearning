@@ -10,6 +10,21 @@ import { useDebounce } from "@/hooks/use-debounce"
 
 import { Category } from "@prisma/client"
 
+const sortLabels: Record<string, string> = {
+  newest: "Newest First",
+  popular: "Best Sellers",
+  price_asc: "Low to High",
+  price_desc: "High to Low",
+}
+
+const priceLabels: Record<string, string> = {
+  all: "Tất cả mức giá",
+  free: "Miễn phí",
+  under_500: "Dưới 500.000đ",
+  "500_2m": "500.000đ - 2.000.000đ",
+  over_2m: "Trên 2.000.000đ",
+}
+
 export function CourseFilters({ categories }: { categories: Category[] }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -89,16 +104,21 @@ export function CourseFilters({ categories }: { categories: Category[] }) {
         <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Sort By</h3>
         <Select 
           value={(searchParams.get("sort") as string) || "newest"} 
-          onValueChange={(val) => handleFilterChange("sort", val ?? "newest")}
+          onValueChange={(details: any) => {
+             const val = typeof details === 'object' && details !== null && 'value' in details ? details.value : details;
+             handleFilterChange("sort", val ?? "newest");
+          }}
         >
-          <SelectTrigger className="h-12 bg-white border-zinc-200 rounded-2xl px-4 text-sm font-bold">
-            <SelectValue placeholder="Sort by" />
+          <SelectTrigger className="h-12 bg-white border-zinc-200 rounded-2xl px-4 text-sm font-bold shadow-sm hover:border-[#FF6600]/50 transition-colors">
+            <SelectValue placeholder="Sort by">
+              {sortLabels[searchParams.get("sort") || "newest"]}
+            </SelectValue>
           </SelectTrigger>
-          <SelectContent className="rounded-2xl border-zinc-100 shadow-xl">
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="popular">Best Sellers</SelectItem>
-            <SelectItem value="price_asc">Price: Low to High</SelectItem>
-            <SelectItem value="price_desc">Price: High to Low</SelectItem>
+          <SelectContent className="rounded-2xl border border-zinc-100 shadow-2xl bg-white p-2 z-[100] min-w-[200px]">
+            <SelectItem value="newest" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Newest First</SelectItem>
+            <SelectItem value="popular" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Best Sellers</SelectItem>
+            <SelectItem value="price_asc" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Low to High</SelectItem>
+            <SelectItem value="price_desc" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">High to Low</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -148,17 +168,22 @@ export function CourseFilters({ categories }: { categories: Category[] }) {
         <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Price</h3>
         <Select 
           value={(searchParams.get("price") as string) || "all"} 
-          onValueChange={(val) => handleFilterChange("price", val ?? "all")}
+          onValueChange={(details: any) => {
+             const val = typeof details === 'object' && details !== null && 'value' in details ? details.value : details;
+             handleFilterChange("price", val ?? "all");
+          }}
         >
-          <SelectTrigger className="h-12 bg-white border-zinc-200 rounded-2xl px-4 text-sm font-bold">
-            <SelectValue placeholder="All Prices" />
+          <SelectTrigger className="h-12 bg-white border-zinc-200 rounded-2xl px-4 text-sm font-bold shadow-sm hover:border-[#FF6600]/50 transition-colors">
+            <SelectValue placeholder="All Prices">
+              {priceLabels[searchParams.get("price") || "all"]}
+            </SelectValue>
           </SelectTrigger>
-          <SelectContent className="rounded-2xl border-zinc-100 shadow-xl">
-            <SelectItem value="all">All Prices</SelectItem>
-            <SelectItem value="free">Free Courses</SelectItem>
-            <SelectItem value="under_500">Under 500k VND</SelectItem>
-            <SelectItem value="500_2m">500k - 2m VND</SelectItem>
-            <SelectItem value="over_2m">Over 2m VND</SelectItem>
+          <SelectContent className="rounded-2xl border border-zinc-100 shadow-2xl bg-white p-2 z-[100] min-w-[200px]">
+            <SelectItem value="all" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Tất cả mức giá</SelectItem>
+            <SelectItem value="free" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Miễn phí</SelectItem>
+            <SelectItem value="under_500" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Dưới 500.000đ</SelectItem>
+            <SelectItem value="500_2m" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">500.000đ - 2.000.000đ</SelectItem>
+            <SelectItem value="over_2m" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Trên 2.000.000đ</SelectItem>
           </SelectContent>
         </Select>
       </div>

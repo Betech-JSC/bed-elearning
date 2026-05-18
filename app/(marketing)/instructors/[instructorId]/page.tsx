@@ -1,10 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { Star, Users, BookOpen, MessageSquare, Award, Globe } from "lucide-react"
+import { Star, Users, BookOpen, Award, Globe } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { CourseCard } from "@/components/ui-custom/course-card"
-import { Button } from "@/components/ui/button"
+import { MessageButton } from "@/components/instructor/message-button"
 
 interface InstructorPageProps {
   params: Promise<{ instructorId: string }>
@@ -104,10 +104,11 @@ export default async function InstructorDetailPage({ params }: InstructorPagePro
                     </div>
                 </div>
                 
-                <Button className="w-full h-16 rounded-2xl bg-[#FF6600] hover:bg-orange-600 font-black text-sm uppercase tracking-widest shadow-xl shadow-orange-500/20 mt-8 gap-3 text-white border-none">
-                    <MessageSquare className="w-4 h-4" />
-                    Gửi tin nhắn
-                </Button>
+                <MessageButton 
+                    instructorId={instructor.id}
+                    instructorName={instructor.name || "Giảng viên"}
+                    instructorImage={instructor.image || undefined}
+                />
              </div>
           </div>
 

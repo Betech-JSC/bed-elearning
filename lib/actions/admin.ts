@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { Role, UserStatus, CourseStatus, OrderStatus } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { sendCourseApprovalEmail, sendCourseRejectionEmail } from "@/lib/mail"
+import { notifyNewCourse } from "@/lib/actions/notifications"
 
 async function checkAdmin() {
   const session = await auth()
@@ -61,6 +62,15 @@ export async function updateCourseStatus(courseId: string, status: CourseStatus,
       console.log("[ADMIN_ACTION] Email sent (if applicable)");
     } catch (emailError) {
       console.error("[ADMIN_SEND_EMAIL_ERROR]", emailError)
+    }
+
+    if (status === "PUBLISHED") {
+      try {
+        await notifyNewCourse(courseId)
+        console.log("[ADMIN_ACTION] Notification for new course sent to students")
+      } catch (notifError) {
+        console.error("[ADMIN_ACTION_NOTIF_ERROR]", notifError)
+      }
     }
 
     revalidatePath("/admin/courses")
@@ -141,3 +151,13 @@ export async function updateGlobalSettings(data: {
     })
     revalidatePath("/admin/settings")
 }
+
+// REVIEW ACTIONS
+export async function deleteReview(reviewId: string) {
+  await checkAdmin()
+  await prisma.review.delete({
+    where: { id: reviewId }
+  })
+  revalidatePath("/admin/reviews")
+}
+

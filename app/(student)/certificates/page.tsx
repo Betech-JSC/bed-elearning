@@ -30,16 +30,19 @@ export default async function CertificatesPage() {
   })
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 min-h-screen animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+    <div className="relative space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
         <div>
-          <h1 className="text-4xl font-extrabold mb-2 text-zinc-900">Chứng chỉ của tôi</h1>
-          <p className="text-zinc-500 font-medium">Theo dõi và tải về các chứng chỉ hoàn thành khoá học của bạn.</p>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-zinc-900 dark:text-white mb-2">Chứng chỉ của tôi</h1>
+          <p className="text-zinc-500 font-medium">Theo dõi và tải về các chứng chỉ tốt nghiệp từ các khóa học của bạn.</p>
         </div>
         
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-          <Input placeholder="Tìm kiếm chứng chỉ..." className="pl-12 h-14 rounded-2xl bg-[#F8F9FA] border-transparent focus-visible:ring-0 focus-visible:bg-white focus-visible:border-orange-200 transition-all shadow-inner" />
+        <div className="relative w-full md:w-80 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-[#FF6600] transition-colors" />
+          <Input 
+            placeholder="Tìm kiếm chứng chỉ..." 
+            className="pl-12 h-14 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm text-sm font-medium focus-visible:ring-[#FF6600]/20 focus-visible:border-[#FF6600] transition-all" 
+          />
         </div>
       </div>
 

@@ -34,8 +34,8 @@ export default async function ProfilePage() {
   if (!user) return redirect("/")
 
   return (
-    <div className="max-w-7xl mx-auto px-10 py-20 bg-[#F8F9FA] rounded-[3rem] my-10 border border-zinc-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+    <div className="relative p-8 md:p-14 bg-[#F8F9FA] dark:bg-zinc-900/40 rounded-[3rem] border border-zinc-100 dark:border-zinc-800 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-8">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
              <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-[#FF6600] border border-orange-100 shadow-sm">
@@ -57,8 +57,8 @@ export default async function ProfilePage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-16">
-        <Tabs defaultValue="info" className="flex-1 space-y-12">
-          <TabsList className="bg-transparent p-0 h-auto w-full grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Tabs defaultValue="info" className="flex-1 space-y-6">
+          <TabsList className="bg-transparent p-0 !h-auto w-full grid grid-cols-2 lg:grid-cols-4 gap-4">
             <TabsTrigger 
               value="info" 
               className="h-24 px-6 rounded-[2rem] border border-zinc-100 bg-white data-[state=active]:bg-[#FF6600] data-[state=active]:text-white data-[state=active]:border-[#FF6600] text-zinc-500 font-black text-xs uppercase tracking-widest flex items-center justify-start gap-4 transition-all shadow-sm hover:shadow-md data-[state=active]:shadow-xl data-[state=active]:shadow-orange-500/20 group"

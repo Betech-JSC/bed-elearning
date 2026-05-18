@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Star, Users, BookOpen, Award } from "lucide-react"
+import { Star, Users, BookOpen, Award, Sparkles } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
 
@@ -54,17 +54,40 @@ export default async function InstructorsPage() {
     <div className="bg-[#F8F9FA] pt-32 pb-24 min-h-screen">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="text-center space-y-8 mb-24 animate-in fade-in slide-in-from-top-8 duration-1000">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-100/50 border border-orange-200 rounded-full">
-                <Award className="w-3.5 h-3.5 text-[#FF6600]" />
-                <span className="text-[10px] font-black text-[#FF6600] uppercase tracking-widest">Đội ngũ giảng viên</span>
+        <div className="relative text-center space-y-6 mb-24 animate-in fade-in slide-in-from-top-8 duration-1000">
+            {/* Background Radial Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[600px] h-[300px] bg-gradient-to-r from-orange-400/10 via-amber-300/10 to-blue-400/10 rounded-full blur-[100px] -z-10 pointer-events-none" />
+            
+            {/* Decorative Top Sparkle / Accent */}
+            <div className="flex justify-center">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/80 dark:bg-zinc-900/80 border border-orange-500/20 rounded-full shadow-md shadow-orange-500/5 backdrop-blur-md group hover:border-orange-500/40 transition-all duration-300 hover:scale-105 cursor-pointer">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF6600]"></span>
+                  </span>
+                  <Award className="w-3.5 h-3.5 text-[#FF6600] group-hover:rotate-12 transition-transform duration-300" />
+                  <span className="text-[10px] font-black text-[#FF6600] uppercase tracking-[0.2em]">Đội ngũ giảng viên tinh hoa</span>
+              </div>
             </div>
-            <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-tight text-zinc-900">
+
+            {/* Premium Main Heading */}
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.15] text-zinc-900 drop-shadow-sm">
                 Học từ những <br/>
-                <span className="text-[#FF6600]">người giỏi nhất.</span>
+                <span className="bg-gradient-to-r from-[#FF6600] via-[#FF8C3b] to-[#FF4500] bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(255,102,0,0.1)] py-1">
+                  người giỏi nhất.
+                </span>
             </h1>
-            <p className="text-zinc-500 font-medium text-lg max-w-2xl mx-auto leading-relaxed">
-                Kết nối với những chuyên gia hàng đầu đang trực tiếp giảng dạy tại Belearning.
+
+            {/* Glowing Accent Line */}
+            <div className="flex justify-center items-center gap-3 pt-2">
+              <div className="h-[2px] w-8 bg-gradient-to-r from-transparent to-[#FF6600]" />
+              <Sparkles className="w-4 h-4 text-[#FF6600] animate-pulse" />
+              <div className="h-[2px] w-8 bg-gradient-to-l from-transparent to-[#FF6600]" />
+            </div>
+
+            {/* Subtitle Description */}
+            <p className="text-zinc-500 font-medium text-lg max-w-2xl mx-auto leading-relaxed pt-2">
+                Kết nối với những chuyên gia hàng đầu đang trực tiếp giảng dạy tại <span className="font-extrabold text-zinc-800">Belearning</span>. Học thực chiến để làm chủ tương lai.
             </p>
         </div>
 

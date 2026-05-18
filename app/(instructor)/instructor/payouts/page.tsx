@@ -25,12 +25,14 @@ export default async function InstructorPayoutsPage() {
     orderBy: { createdAt: "desc" }
   })
 
+  // Get last used bank info for auto-fill
+  const lastBankInfo = payouts.find(p => p.bankInfo && p.bankInfo.trim().length > 0)?.bankInfo || ""
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black">Doanh thu & Rút tiền</h1>
-        <p className="text-zinc-500">Quản lý thu nhập từ các khóa học của bạn và yêu cầu rút tiền.</p>
+    <div className="space-y-8 p-6 md:p-8 max-w-7xl mx-auto">
+      <div>
+        <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 mb-2">Doanh thu & Rút tiền</h1>
+        <p className="text-zinc-500 font-medium text-sm">Quản lý thu nhập từ các khóa học của bạn và gửi yêu cầu thanh toán nhanh chóng.</p>
       </div>
       
       <PayoutClient 
@@ -38,6 +40,7 @@ export default async function InstructorPayoutsPage() {
         availableBalance={availableBalance}
         totalPaidOut={totalPaidOut}
         payouts={payouts}
+        lastBankInfo={lastBankInfo}
       />
     </div>
   )

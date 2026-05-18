@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { notifyNewLesson } from "@/lib/actions/notifications"
 
 async function checkInstructor(courseId: string) {
   const session = await auth()
@@ -56,6 +57,12 @@ export async function createLesson(courseId: string, sectionId: string, title: s
       order: lastLesson ? lastLesson.order + 1 : 0
     }
   })
+
+  try {
+    await notifyNewLesson(courseId, title)
+  } catch (notifError) {
+    console.error("[INSTRUCTOR_ACTION_NOTIF_ERROR]", notifError)
+  }
 
   revalidatePath(`/instructor/courses/${courseId}/edit`)
   return newLesson

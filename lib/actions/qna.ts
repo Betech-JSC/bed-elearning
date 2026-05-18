@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { notifyQnaReply } from "@/lib/actions/notifications"
 
 export async function createQuestion({
   lessonId,
@@ -60,6 +61,19 @@ export async function createAnswer({
         userId
       }
     })
+
+    try {
+      const question = await prisma.question.findUnique({
+        where: { id: questionId },
+        select: { userId: true }
+      })
+
+      if (question && question.userId !== userId) {
+        await notifyQnaReply(question.userId, lessonId, session.user.name || "Học viên/Giáo viên")
+      }
+    } catch (notifError) {
+      console.error("[QNA_ACTION_NOTIF_ERROR]", notifError)
+    }
 
     revalidatePath(`/learn/[slug]/${lessonId}`, "page")
     return { success: true, data: answer }

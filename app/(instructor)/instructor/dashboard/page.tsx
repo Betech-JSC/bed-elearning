@@ -2,10 +2,14 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import Link from "next/link"
+import { cookies } from "next/headers"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, BookOpen, Users, DollarSign, BarChart2, Heart, HelpCircle, ArrowRight, MessageSquare, TrendingUp, Search, Bell, ChevronRight } from "lucide-react"
+import { PlusCircle, BookOpen, Users, DollarSign, BarChart2, HelpCircle, MessageSquare, TrendingUp, ChevronRight } from "lucide-react"
 import { StatCard } from "@/components/shared/stat-card"
 import { formatPrice } from "@/lib/utils"
+import { DashboardHeader } from "@/components/dashboard/dashboard-header"
+
+export const dynamic = "force-dynamic"
 
 export default async function InstructorDashboardPage() {
   const session = await auth()
@@ -14,8 +18,11 @@ export default async function InstructorDashboardPage() {
     return redirect("/")
   }
 
+  const userId = session.user.id
+
+  // Fetch instructor's courses
   const courses = await prisma.course.findMany({
-    where: { instructorId: session.user.id },
+    where: { instructorId: userId },
     include: {
       _count: { select: { enrollments: true, sections: true, wishlists: true } },
       enrollments: { select: { id: true } },
@@ -43,57 +50,92 @@ export default async function InstructorDashboardPage() {
     }, 0)
   }, 0)
 
+  // Map courses to searchable format
+  const coursesForSearch = courses.map(c => ({
+    id: c.id,
+    title: c.title,
+    slug: c.slug,
+    thumbnail: c.thumbnail,
+    price: c.price,
+    salePrice: c.price,
+    category: null
+  }))
+
+  // Seed / Fetch notifications for instructor
+  const cookieStore = await cookies()
+  const isCleared = cookieStore.get("belearning_notifications_cleared")?.value === "true"
+
+  if (!isCleared) {
+    const welcomeNotificationExists = await prisma.notification.findFirst({
+      where: { userId, title: "Chào mừng đến với Belearning!" }
+    })
+
+    if (!welcomeNotificationExists) {
+      await prisma.notification.createMany({
+        data: [
+          {
+            userId,
+            title: "Chào mừng đến với Belearning!",
+            message: "Hôm nay là một ngày tuyệt vời để quản lý học viện và theo dõi hiệu suất giảng dạy của bạn. Chúc bạn một ngày tốt lành!",
+            isRead: false,
+            link: "/instructor"
+          },
+          {
+            userId,
+            title: "Lời khuyên dành cho Giảng viên 💡",
+            message: "Thường xuyên giải đáp các câu hỏi Q&A từ học viên sẽ giúp tăng uy tín khóa học của bạn lên 30%!",
+            isRead: false,
+            link: "/instructor/qa"
+          }
+        ]
+      })
+    }
+  }
+
+  const notifications = await prisma.notification.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" }
+  })
+
   return (
     <div className="space-y-12">
-      {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div>
-           <h1 className="text-5xl font-black tracking-tight text-zinc-900 mb-2">
-             Instructor <span className="text-[#FF6600]">Dashboard</span>
-           </h1>
-           <p className="text-zinc-500 font-medium">Manage your academy and track your growth.</p>
-        </div>
-        <div className="flex items-center gap-4">
-           <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-zinc-100 text-zinc-400 hover:text-zinc-900 cursor-pointer transition-all">
-              <Search className="w-5 h-5" />
-           </div>
-           <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-zinc-100 text-zinc-400 hover:text-zinc-900 cursor-pointer transition-all relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
-           </div>
-           <Button asChild className="bg-[#FF6600] hover:bg-orange-600 rounded-[1.5rem] h-14 px-8 font-black shadow-lg shadow-orange-500/20 ml-4">
-              <Link href="/instructor/courses/new" className="flex items-center gap-2">
-                 <PlusCircle className="w-5 h-5" />
-                 New Course
-              </Link>
-           </Button>
-        </div>
-      </div>
+      {/* HEADER SECTION WITH INTEGRATED REAL NOTIFICATIONS & SEARCH */}
+      <DashboardHeader 
+        userName={session.user.name || "Giảng viên"}
+        courses={coursesForSearch}
+        initialNotifications={notifications}
+        title={
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-zinc-900">
+            Bảng điều khiển <span className="text-[#FF6600]">Giảng viên</span>
+          </h1>
+        }
+        subtitle="Quản lý học viện giảng dạy và theo dõi sự phát triển của bạn."
+      />
 
       {/* STATS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
          <StatCard 
-            label="Total Revenue" 
+            label="Tổng doanh thu" 
             value={formatPrice(totalRevenue)} 
             icon={DollarSign} 
             color="orange"
             trend={{ value: "12%", positive: true }}
          />
          <StatCard 
-            label="Total Students" 
+            label="Tổng học viên" 
             value={totalStudents} 
             icon={Users} 
             color="blue"
             trend={{ value: "5%", positive: true }}
          />
          <StatCard 
-            label="Active Courses" 
+            label="Khóa học hoạt động" 
             value={courses.filter(c => c.status === "PUBLISHED").length} 
             icon={BookOpen} 
             color="green"
          />
          <StatCard 
-            label="Unresolved Q&A" 
+            label="Câu hỏi chưa giải đáp" 
             value={totalUnresolvedQuestions} 
             icon={MessageSquare} 
             color="purple"
@@ -105,9 +147,9 @@ export default async function InstructorDashboardPage() {
         <div className="lg:col-span-2 space-y-12">
           <section>
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-black text-zinc-900">Recent Courses</h2>
+              <h2 className="text-3xl font-black text-zinc-900">Khóa học gần đây</h2>
               <Link href="/instructor/courses" className="text-sm font-black text-[#FF6600] flex items-center gap-1 hover:underline">
-                View All Courses <ChevronRight className="w-4 h-4" />
+                Xem tất cả khóa học <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
 
@@ -117,10 +159,10 @@ export default async function InstructorDashboardPage() {
                     <div className="w-20 h-20 bg-[#F8F9FA] rounded-3xl flex items-center justify-center mb-6">
                        <BookOpen className="w-10 h-10 text-zinc-300" />
                     </div>
-                    <h3 className="text-2xl font-black text-zinc-900 mb-2">No courses yet</h3>
-                    <p className="text-zinc-500 font-medium mb-10 max-w-sm">Share your knowledge with the world. Create your first course today.</p>
+                    <h3 className="text-2xl font-black text-zinc-900 mb-2">Chưa có khóa học nào</h3>
+                    <p className="text-zinc-500 font-medium mb-10 max-w-sm">Hãy chia sẻ kiến thức của bạn với cộng đồng. Tạo khóa học đầu tiên của bạn ngay hôm nay.</p>
                     <Button asChild className="bg-zinc-900 hover:bg-zinc-800 rounded-[1.5rem] h-14 px-10 font-black">
-                      <Link href="/instructor/courses/new">Create Course</Link>
+                      <Link href="/instructor/courses/new">Tạo khóa học ngay</Link>
                     </Button>
                   </div>
                ) : (
@@ -140,23 +182,23 @@ export default async function InstructorDashboardPage() {
                            <div className="flex flex-col gap-1">
                               <span className="font-black text-zinc-900 group-hover:text-[#FF6600] transition-colors">{course.title}</span>
                               <div className="flex items-center gap-4">
-                                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{course._count.sections} Modules</span>
-                                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{course._count.enrollments} Students</span>
+                                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{course._count.sections} Chương học</span>
+                                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{course._count.enrollments} Học viên</span>
                               </div>
                            </div>
                         </div>
                         <div className="flex items-center gap-6">
-                          <span className={`text-[10px] font-black px-4 py-1.5 rounded-xl uppercase tracking-widest ${
-                            course.status === "PUBLISHED" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
-                            course.status === "PENDING_REVIEW" ? "bg-orange-50 text-orange-600 border border-orange-100" :
-                            course.status === "REJECTED" ? "bg-red-50 text-red-600 border border-red-100" :
-                            "bg-zinc-100 text-zinc-500 border border-zinc-200"
-                          }`}>{course.status}</span>
-                          <Button asChild variant="ghost" size="icon" className="rounded-xl h-12 w-12 hover:bg-white hover:shadow-md transition-all text-zinc-400 hover:text-zinc-900">
-                            <Link href={`/instructor/courses/${course.id}/edit`}>
-                               <TrendingUp className="w-5 h-5" />
-                            </Link>
-                          </Button>
+                           <span className={`text-[10px] font-black px-4 py-1.5 rounded-xl uppercase tracking-widest ${
+                             course.status === "PUBLISHED" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                             course.status === "PENDING_REVIEW" ? "bg-orange-50 text-orange-600 border border-orange-100" :
+                             course.status === "REJECTED" ? "bg-red-50 text-red-600 border border-red-100" :
+                             "bg-zinc-100 text-zinc-500 border border-zinc-200"
+                           }`}>{course.status === "PUBLISHED" ? "Đã xuất bản" : course.status === "PENDING_REVIEW" ? "Đang chờ duyệt" : "Bản nháp"}</span>
+                           <Button asChild variant="ghost" size="icon" className="rounded-xl h-12 w-12 hover:bg-white hover:shadow-md transition-all text-zinc-400 hover:text-zinc-900">
+                             <Link href={`/instructor/courses/${course.id}/edit`}>
+                                <TrendingUp className="w-5 h-5" />
+                             </Link>
+                           </Button>
                         </div>
                       </div>
                     ))}
@@ -167,26 +209,26 @@ export default async function InstructorDashboardPage() {
 
           {/* Quick Actions */}
           <section>
-             <h2 className="text-3xl font-black text-zinc-900 mb-8">Quick Insights</h2>
+             <h2 className="text-3xl font-black text-zinc-900 mb-8">Truy cập nhanh</h2>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-[#F8F9FA] p-10 rounded-[3rem] border border-zinc-100 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 transition-all group">
                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
                       <BarChart2 className="w-8 h-8 text-blue-600" />
                    </div>
-                   <h3 className="text-2xl font-black mb-3">Analytics</h3>
-                   <p className="text-zinc-500 font-medium mb-10 leading-relaxed text-sm">Deep dive into your performance metrics and student engagement.</p>
+                   <h3 className="text-2xl font-black mb-3">Phân tích số liệu</h3>
+                   <p className="text-zinc-500 font-medium mb-10 leading-relaxed text-sm">Phân tích sâu các chỉ số hiệu quả và tương tác của học viên.</p>
                    <Button asChild variant="outline" className="w-full h-14 rounded-2xl font-black border-zinc-200 hover:bg-white hover:text-[#FF6600]">
-                      <Link href="/instructor/analytics">View Reports</Link>
+                      <Link href="/instructor/analytics">Xem báo cáo</Link>
                    </Button>
                 </div>
                 <div className="bg-[#F8F9FA] p-10 rounded-[3rem] border border-zinc-100 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 transition-all group">
                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
                       <DollarSign className="w-8 h-8 text-emerald-600" />
                    </div>
-                   <h3 className="text-2xl font-black mb-3">Payouts</h3>
-                   <p className="text-zinc-500 font-medium mb-10 leading-relaxed text-sm">Withdraw your earnings and manage your financial records.</p>
+                   <h3 className="text-2xl font-black mb-3">Yêu cầu rút tiền</h3>
+                   <p className="text-zinc-500 font-medium mb-10 leading-relaxed text-sm">Rút các khoản thu nhập tích lũy và quản lý lịch sử thanh toán.</p>
                    <Button asChild variant="outline" className="w-full h-14 rounded-2xl font-black border-zinc-200 hover:bg-white hover:text-[#FF6600]">
-                      <Link href="/instructor/payouts">Request Payout</Link>
+                      <Link href="/instructor/payouts">Rút tiền ngay</Link>
                    </Button>
                 </div>
              </div>
@@ -202,10 +244,10 @@ export default async function InstructorDashboardPage() {
                   <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-8 border border-white/10">
                      <HelpCircle className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-3xl font-black mb-3 leading-tight">Teaching <br/>Academy</h3>
-                  <p className="text-white/80 text-sm mb-10 leading-relaxed font-medium">New to teaching? Learn how to create high-quality course content.</p>
+                  <h3 className="text-3xl font-black mb-3 leading-tight">Học viện<br/>Giảng dạy</h3>
+                  <p className="text-white/80 text-sm mb-10 leading-relaxed font-medium">Bạn mới dạy học? Hãy khám phá các tiêu chuẩn tạo nội dung bài giảng chất lượng cao.</p>
                   <Button asChild className="w-full bg-white text-[#FF6600] hover:bg-zinc-100 rounded-2xl font-black h-14 shadow-lg">
-                     <Link href="/resources/teaching-guide">Learning Center</Link>
+                     <Link href="/resources/teaching-guide">Trung tâm Học tập</Link>
                   </Button>
               </div>
            </div>
@@ -214,23 +256,23 @@ export default async function InstructorDashboardPage() {
            <div className="bg-white border border-zinc-100 rounded-[3rem] p-10 shadow-sm">
               <h3 className="text-xl font-black text-zinc-900 mb-8 flex items-center gap-3">
                  <MessageSquare className="w-6 h-6 text-[#FF6600]" />
-                 Pending Questions
+                 Câu hỏi đang chờ
               </h3>
               <div className="space-y-8">
                  {totalUnresolvedQuestions > 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 text-center">
                        <p className="text-4xl font-black text-[#FF6600] mb-2">{totalUnresolvedQuestions}</p>
-                       <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-8">Questions waiting for you</p>
+                       <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-8">câu hỏi đang chờ phản hồi</p>
                        <Button asChild variant="outline" className="w-full h-12 rounded-2xl font-black border-zinc-100">
-                          <Link href="/instructor/qa">Answer Now</Link>
+                          <Link href="/instructor/qa">Trả lời ngay</Link>
                        </Button>
                     </div>
-                 ) : (
+                  ) : (
                     <div className="text-center py-10">
-                       <p className="text-zinc-400 font-bold uppercase tracking-widest text-xs">All caught up!</p>
-                       <p className="text-zinc-500 text-xs mt-2 font-medium">You have no pending questions.</p>
+                       <p className="text-zinc-400 font-bold uppercase tracking-widest text-xs">Tuyệt vời!</p>
+                       <p className="text-zinc-500 text-xs mt-2 font-medium">Bạn không có câu hỏi nào đang chờ giải đáp.</p>
                     </div>
-                 )}
+                  )}
               </div>
            </div>
         </div>

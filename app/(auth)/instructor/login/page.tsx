@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
-import { Lock, Mail, CheckCircle2, Star } from "lucide-react"
+import { Lock, Mail, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -29,15 +29,15 @@ export default function InstructorLoginPage() {
       })
 
       if (result?.error) {
-        toast.error("Invalid credentials.")
+        toast.error("Email hoặc mật khẩu không chính xác.")
         return
       }
 
-      toast.success("Instructor login successful.")
+      toast.success("Đăng nhập giảng viên thành công.")
       router.push("/instructor/dashboard")
       router.refresh()
     } catch (err) {
-      toast.error("An error occurred.")
+      toast.error("Đã xảy ra lỗi.")
     } finally {
       setIsLoading(false)
     }
@@ -48,16 +48,16 @@ export default function InstructorLoginPage() {
       {/* Left Content */}
       <div className="space-y-10">
         <h1 className="text-6xl font-black tracking-tight leading-[1.1] text-zinc-900">
-            Empower the next <br/>
-            generation of <span className="text-[#FF6600]">thinkers.</span>
+            Trao quyền cho <br/>
+            thế hệ <span className="text-[#FF6600]">tư duy mới.</span>
         </h1>
-        <p className="text-lg text-zinc-500 font-medium leading-relaxed max-w-lg">
-            Join over 5,000 professional educators delivering world-class curriculum through Belearning&apos;s intuitive instructor portal.
+        <p className="text-base text-zinc-500 font-medium leading-relaxed max-w-lg">
+            Tham gia cùng hơn 5.000 nhà giáo dục chuyên nghiệp đang cung cấp chương trình giảng dạy đẳng cấp thế giới thông qua cổng thông tin giảng viên trực quan của Belearning.
         </p>
         
-        <div className="relative rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white group">
+        <div className="relative rounded-[3.5rem] overflow-hidden shadow-2xl border-[12px] border-white group">
             <Image 
-                src="/hero_vibe_coding_1778041166767.png" 
+                src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&q=80" 
                 alt="Instructor Portal" 
                 width={800} 
                 height={600} 
@@ -65,81 +65,81 @@ export default function InstructorLoginPage() {
             />
             <div className="absolute bottom-6 left-6 flex items-center gap-2 bg-orange-600/90 backdrop-blur-md px-4 py-2 rounded-xl text-white text-[10px] font-black uppercase tracking-widest">
                 <Star className="w-3.5 h-3.5 fill-white" />
-                Premier Instructor Network
+                Mạng lưới giảng viên hàng đầu
             </div>
         </div>
       </div>
 
       {/* Right Form Card */}
-      <Card className="border-none shadow-2xl shadow-zinc-200/50 rounded-[3rem] bg-white overflow-hidden p-12 md:p-16">
-        <div className="mb-10">
-            <h2 className="text-3xl font-black tracking-tight text-zinc-900 mb-3">Instructor Portal</h2>
+      <Card className="border border-zinc-100/80 shadow-2xl shadow-zinc-200/40 rounded-[2.5rem] bg-white overflow-hidden p-10 md:p-12">
+        <div className="mb-8">
+            <h2 className="text-3xl font-black tracking-tight text-zinc-900 mb-2">Cổng giảng viên</h2>
             <p className="text-zinc-500 font-medium text-sm leading-relaxed">
-                Please enter your professional credentials to manage your curriculum.
+                Vui lòng nhập thông tin đăng nhập của bạn để quản lý lớp học.
             </p>
         </div>
         
         <CardContent className="p-0 space-y-8">
-          <form onSubmit={onSubmit} className="space-y-6">
+          <form onSubmit={onSubmit} className="space-y-5">
             <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-zinc-400 ml-1">Professional Email</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Email chuyên môn</label>
                 <div className="relative">
-                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                     <Input 
                         placeholder="instructor@belearning.com" 
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="h-16 rounded-2xl border-none bg-[#F1F3F5] pl-14 pr-6 text-sm font-medium focus-visible:ring-orange-500/20"
+                        className="h-14 rounded-xl border border-zinc-200 bg-zinc-50/50 pl-12 pr-5 text-sm font-medium transition-all focus:bg-white focus:border-[#FF6600] focus:ring-4 focus:ring-[#FF6600]/10"
                     />
                 </div>
             </div>
 
             <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
-                    <label className="text-xs font-black uppercase tracking-widest text-zinc-400">Password</label>
-                    <button type="button" className="text-xs font-black uppercase tracking-widest text-[#FF6600]">Forgot password?</button>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Mật khẩu</label>
+                    <button type="button" className="text-xs font-black text-[#FF6600] hover:underline">Quên mật khẩu?</button>
                 </div>
                 <div className="relative">
-                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                     <Input 
                         placeholder="••••••••••••" 
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="h-16 rounded-2xl border-none bg-[#F1F3F5] pl-14 pr-6 text-sm font-medium focus-visible:ring-orange-500/20"
+                        className="h-14 rounded-xl border border-zinc-200 bg-zinc-50/50 pl-12 pr-5 text-sm font-medium transition-all focus:bg-white focus:border-[#FF6600] focus:ring-4 focus:ring-[#FF6600]/10"
                     />
                 </div>
             </div>
 
-            <div className="flex items-center gap-3 ml-1">
-                <Checkbox id="keep-logged" className="w-5 h-5 rounded-lg border-zinc-200 data-[state=checked]:bg-[#FF6600] data-[state=checked]:border-none" />
-                <label htmlFor="keep-logged" className="text-sm font-medium text-zinc-500 cursor-pointer">Keep me logged in for 30 days</label>
+            <div className="flex items-center gap-3 ml-1 pt-1">
+                <Checkbox id="keep-logged" className="w-4.5 h-4.5 rounded-md border-zinc-200 data-[state=checked]:bg-[#FF6600] data-[state=checked]:border-[#FF6600]" />
+                <label htmlFor="keep-logged" className="text-xs font-semibold text-zinc-500 cursor-pointer select-none">Duy trì đăng nhập trong 30 ngày</label>
             </div>
 
-            <Button type="submit" className="w-full h-16 rounded-2xl bg-[#FF6600] hover:bg-orange-600 transition-all font-black text-sm uppercase tracking-widest shadow-xl shadow-orange-500/20" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Log In as Instructor"}
+            <Button type="submit" className="w-full h-14 rounded-xl bg-[#FF6600] hover:bg-orange-600 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-orange-500/10 border-none mt-2" disabled={isLoading}>
+                {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </form>
 
-          <div className="pt-8 text-center space-y-6">
-              <p className="text-sm font-medium text-zinc-400">New to our teaching community?</p>
-              <Button asChild variant="outline" className="w-full h-16 rounded-full border-zinc-200 bg-white hover:bg-zinc-50 transition-all font-black text-sm text-zinc-900">
-                  <Link href="/instructor-application">Create Instructor Account</Link>
+          <div className="pt-6 text-center space-y-4 border-t border-zinc-50">
+              <p className="text-xs font-semibold text-zinc-400">Bạn là thành viên mới trong cộng đồng giảng dạy?</p>
+              <Button asChild variant="outline" className="w-full h-14 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/50 font-black text-xs text-zinc-700 transition-all">
+                  <Link href="/instructor-application">Tạo tài khoản Giảng viên</Link>
               </Button>
           </div>
         </CardContent>
 
-        <div className="mt-12 flex justify-center gap-8 text-[10px] text-zinc-400 font-black uppercase tracking-widest">
+        <div className="mt-10 flex justify-center gap-8 text-[10px] text-zinc-400 font-black uppercase tracking-widest">
             <span className="flex items-center gap-2">
                 <div className="w-1 h-1 rounded-full bg-emerald-500" />
-                Secure Access
+                Truy cập bảo mật
             </span>
             <span className="flex items-center gap-2">
                 <div className="w-1 h-1 rounded-full bg-blue-500" />
-                24/7 Support
+                Hỗ trợ 24/7
             </span>
         </div>
       </Card>

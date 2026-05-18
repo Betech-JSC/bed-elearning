@@ -37,6 +37,16 @@ export async function POST(req: Request) {
       }
     })
 
+    await prisma.notification.create({
+      data: {
+        userId: session.user.id,
+        title: "Yêu cầu rút tiền đang được xử lý 🕒",
+        message: `Lệnh rút tiền trị giá ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)} của bạn đã được ghi nhận. Quản trị viên sẽ xử lý trong thời gian sớm nhất.`,
+        isRead: false,
+        link: "/instructor/payouts"
+      }
+    })
+
     return NextResponse.json(payout)
   } catch (error) {
     console.error("[PAYOUTS_POST]", error)

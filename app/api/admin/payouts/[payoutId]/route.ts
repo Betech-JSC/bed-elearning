@@ -43,6 +43,27 @@ export async function PATCH(
       { status, notes, amount: payout.amount }
     )
 
+    // Send notification to Instructor
+    let notifTitle = ""
+    let notifMessage = ""
+    if (status === "PAID") {
+      notifTitle = "Yêu cầu rút tiền thành công 🎉"
+      notifMessage = `Lệnh rút tiền trị giá ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(payout.amount)} của bạn đã được chuyển khoản thành công.`
+    } else {
+      notifTitle = "Yêu cầu rút tiền bị từ chối ❌"
+      notifMessage = `Lệnh rút tiền của bạn không thành công. Lý do: ${notes || "Vui lòng liên hệ Admin"}`
+    }
+
+    await prisma.notification.create({
+      data: {
+        userId: payout.instructorId,
+        title: notifTitle,
+        message: notifMessage,
+        isRead: false,
+        link: "/instructor/payouts"
+      }
+    })
+
     return NextResponse.json(payout)
   } catch (error) {
     console.error("[PAYOUTS_PATCH]", error)

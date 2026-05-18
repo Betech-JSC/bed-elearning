@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { notifyCourseCompleted } from "@/lib/actions/notifications"
 
 export async function completeLesson(lessonId: string) {
   const session = await auth()
@@ -72,6 +73,14 @@ export async function completeLesson(lessonId: string) {
       completedAt: progressPercent === 100 ? new Date() : enrollment.completedAt
     }
   })
+
+  if (progressPercent === 100 && !enrollment.isCompleted) {
+    try {
+      await notifyCourseCompleted(userId, courseId)
+    } catch (notifError) {
+      console.error("[COURSE_ACTION_NOTIF_ERROR]", notifError)
+    }
+  }
 
   revalidatePath(`/learn/${lesson.section.course.slug}/${lessonId}`)
   return { success: true, progress: progressPercent }

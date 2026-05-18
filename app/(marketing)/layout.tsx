@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/shared/navbar"
+import { ChatFloatingBox } from "@/components/chat/chat-floating-box"
 import Link from "next/link"
 
 export default function MarketingLayout({
@@ -9,6 +10,7 @@ export default function MarketingLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
+      <ChatFloatingBox />
       <main className="flex-1">{children}</main>
       <footer className="bg-zinc-900 pt-32 pb-20 rounded-t-[5rem] relative overflow-hidden">
 
