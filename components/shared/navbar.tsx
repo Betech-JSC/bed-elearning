@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { signOut, useSession } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { CartSheet } from "@/components/cart/cart-sheet"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -109,12 +110,7 @@ export function Navbar() {
                    className="bg-transparent border-none text-xs font-bold focus:outline-none w-full text-zinc-900 placeholder:text-zinc-400"
                  />
               </div>
-              <Link href="/cart" className="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-zinc-400 hover:text-[#FF6600] hover:bg-orange-50 transition-all relative">
-                 <ShoppingCart className="w-5 h-5" />
-                 <div className="absolute top-2 right-2 w-4 h-4 bg-[#FF6600] rounded-full border-2 border-white flex items-center justify-center">
-                    <span className="text-[8px] font-black text-white">0</span>
-                 </div>
-              </Link>
+              <CartSheet />
            </div>
 
            <div className="flex items-center gap-4">

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Star, Users, ShoppingCart, Zap, Award } from "lucide-react"
-import { useCart } from "@/hooks/use-cart"
+import { useCart } from "@/lib/store/use-cart"
 import { useRouter } from "next/navigation"
 import { WishlistButton } from "@/components/course/wishlist-button"
 import { toast } from "sonner"
@@ -51,6 +51,7 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
     addItem({
       id: course.id,
       title: course.title,
+      slug: course.slug,
       price: course.price,
       thumbnail: course.thumbnail,
       instructorName: course.instructor?.name || "",
@@ -69,6 +70,7 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
     addItem({
       id: course.id,
       title: course.title,
+      slug: course.slug,
       price: course.price,
       thumbnail: course.thumbnail,
       instructorName: course.instructor?.name || "",

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Zap, BookOpen, ArrowRight } from "lucide-react"
-import { useCart } from "@/hooks/use-cart"
+import { useCart } from "@/lib/store/use-cart"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -29,6 +29,7 @@ export function CourseEnrollButtons({ course, isEnrolled }: CourseEnrollButtonsP
     addItem({
       id: course.id,
       title: course.title,
+      slug: course.slug,
       price: course.price,
       thumbnail: course.thumbnail,
       instructorName: course.instructor.name || "",
@@ -39,6 +40,7 @@ export function CourseEnrollButtons({ course, isEnrolled }: CourseEnrollButtonsP
     addItem({
       id: course.id,
       title: course.title,
+      slug: course.slug,
       price: course.price,
       thumbnail: course.thumbnail,
       instructorName: course.instructor.name || "",

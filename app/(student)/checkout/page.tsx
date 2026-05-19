@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useCart } from "@/hooks/use-cart"
+import { useCart } from "@/lib/store/use-cart"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -64,7 +64,7 @@ export default function CheckoutPage() {
          </div>
          <h1 className="text-4xl font-black">Giỏ hàng đang trống</h1>
          <p className="text-zinc-500 max-w-md mx-auto">Hãy khám phá các khóa học hấp dẫn của chúng tôi để bắt đầu hành trình chinh phục AI nhé!</p>
-         <Button asChild className="rounded-2xl h-14 px-8 font-bold bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-600/20">
+         <Button asChild className="rounded-2xl h-14 px-8 font-bold bg-[#FF6600] hover:bg-orange-600 shadow-xl shadow-orange-500/20">
             <Link href="/courses">Khám phá ngay</Link>
          </Button>
       </div>
@@ -90,11 +90,11 @@ export default function CheckoutPage() {
                           <Image src={item.thumbnail || ""} alt={item.title} fill className="object-cover" />
                        </div>
                        <div className="flex-1 space-y-1">
-                          <h3 className="font-bold text-lg group-hover:text-blue-600 transition-colors">{item.title}</h3>
+                          <h3 className="font-bold text-lg group-hover:text-[#FF6600] transition-colors">{item.title}</h3>
                           <p className="text-sm text-zinc-500 italic">Giảng viên: {item.instructorName}</p>
                        </div>
                        <div className="text-right space-y-2">
-                          <div className="font-black text-xl text-blue-600">
+                          <div className="font-black text-xl text-[#FF6600]">
                              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
                           </div>
                           <button 
@@ -120,7 +120,7 @@ export default function CheckoutPage() {
                     <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                     <Input 
                        placeholder="Nhập mã ưu đãi (ví dụ: VIBECODE10)..." 
-                       className="h-14 pl-12 rounded-2xl bg-white dark:bg-zinc-950 border-zinc-200 focus:ring-blue-500"
+                       className="h-14 pl-12 rounded-2xl bg-white dark:bg-zinc-950 border-zinc-200 focus:ring-[#FF6600]"
                        value={couponCode}
                        onChange={(e) => setCouponCode(e.target.value)}
                     />
@@ -152,7 +152,7 @@ export default function CheckoutPage() {
                  </div>
                  <div className="pt-4 border-t flex justify-between items-end">
                     <span className="font-bold text-zinc-900 dark:text-white">Tổng cộng</span>
-                    <span className="text-3xl font-black text-blue-600">
+                    <span className="text-3xl font-black text-[#FF6600]">
                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}
                     </span>
                  </div>
@@ -165,40 +165,40 @@ export default function CheckoutPage() {
                        onClick={() => setPaymentMethod("VNPAY")}
                        className={cn(
                           "w-full p-4 rounded-2xl border-2 flex items-center justify-between transition-all",
-                          paymentMethod === "VNPAY" ? "border-blue-600 bg-blue-50/50 dark:bg-blue-900/10" : "border-zinc-100 dark:border-zinc-800 hover:border-zinc-200"
+                          paymentMethod === "VNPAY" ? "border-[#FF6600] bg-orange-50/50 dark:bg-orange-900/10" : "border-zinc-100 dark:border-zinc-800 hover:border-zinc-200"
                        )}
                     >
                        <div className="flex items-center gap-3">
-                          <Wallet className={cn("w-5 h-5", paymentMethod === "VNPAY" ? "text-blue-600" : "text-zinc-400")} />
+                          <Wallet className={cn("w-5 h-5", paymentMethod === "VNPAY" ? "text-[#FF6600]" : "text-zinc-400")} />
                           <span className="font-bold">Ví điện tử / ATM (VNPay)</span>
                        </div>
-                       {paymentMethod === "VNPAY" && <div className="w-2 h-2 rounded-full bg-blue-600" />}
+                       {paymentMethod === "VNPAY" && <div className="w-2 h-2 rounded-full bg-[#FF6600]" />}
                     </button>
                     <button 
                        onClick={() => setPaymentMethod("STRIPE")}
                        className={cn(
                           "w-full p-4 rounded-2xl border-2 flex items-center justify-between transition-all",
-                          paymentMethod === "STRIPE" ? "border-blue-600 bg-blue-50/50 dark:bg-blue-900/10" : "border-zinc-100 dark:border-zinc-800 hover:border-zinc-200"
+                          paymentMethod === "STRIPE" ? "border-[#FF6600] bg-orange-50/50 dark:bg-orange-900/10" : "border-zinc-100 dark:border-zinc-800 hover:border-zinc-200"
                        )}
                     >
                        <div className="flex items-center gap-3">
-                          <CreditCard className={cn("w-5 h-5", paymentMethod === "STRIPE" ? "text-blue-600" : "text-zinc-400")} />
+                          <CreditCard className={cn("w-5 h-5", paymentMethod === "STRIPE" ? "text-[#FF6600]" : "text-zinc-400")} />
                           <span className="font-bold">Thẻ Quốc tế (Stripe)</span>
                        </div>
-                       {paymentMethod === "STRIPE" && <div className="w-2 h-2 rounded-full bg-blue-600" />}
+                       {paymentMethod === "STRIPE" && <div className="w-2 h-2 rounded-full bg-[#FF6600]" />}
                     </button>
                     <button 
                        onClick={() => setPaymentMethod("SEPAY")}
                        className={cn(
                           "w-full p-4 rounded-2xl border-2 flex items-center justify-between transition-all",
-                          paymentMethod === "SEPAY" ? "border-blue-600 bg-blue-50/50 dark:bg-blue-900/10" : "border-zinc-100 dark:border-zinc-800 hover:border-zinc-200"
+                          paymentMethod === "SEPAY" ? "border-[#FF6600] bg-orange-50/50 dark:bg-orange-900/10" : "border-zinc-100 dark:border-zinc-800 hover:border-zinc-200"
                        )}
                     >
                        <div className="flex items-center gap-3">
-                          <div className="w-5 h-5 bg-blue-600 rounded-md flex items-center justify-center text-[10px] text-white font-bold">QR</div>
+                          <div className="w-5 h-5 bg-[#FF6600] rounded-md flex items-center justify-center text-[10px] text-white font-bold">QR</div>
                           <span className="font-bold">Chuyển khoản QR (SePay)</span>
                        </div>
-                       {paymentMethod === "SEPAY" && <div className="w-2 h-2 rounded-full bg-blue-600" />}
+                       {paymentMethod === "SEPAY" && <div className="w-2 h-2 rounded-full bg-[#FF6600]" />}
                     </button>
                  </div>
               </div>
@@ -206,7 +206,7 @@ export default function CheckoutPage() {
               <Button 
                 onClick={onCheckout}
                 disabled={isLoading}
-                className="w-full h-16 rounded-2xl bg-blue-600 hover:bg-blue-700 font-black text-xl shadow-xl shadow-blue-600/20 gap-2 transition-all active:scale-95"
+                className="w-full h-16 rounded-2xl bg-[#FF6600] hover:bg-orange-600 font-black text-xl shadow-xl shadow-orange-500/20 gap-2 transition-all active:scale-95"
               >
                  {isLoading ? (
                     <Loader2 className="w-6 h-6 animate-spin" />
