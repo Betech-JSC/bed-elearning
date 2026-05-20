@@ -24,7 +24,9 @@ import Image from "next/image"
 const formSchema = z.object({
   name: z.string().min(2, { message: "Tên phải chứa ít nhất 2 ký tự." }),
   email: z.string().email({ message: "Vui lòng nhập địa chỉ email hợp lệ." }),
-  password: z.string().min(8, { message: "Mật khẩu phải chứa ít nhất 8 ký tự." }),
+  password: z.string()
+    .min(8, { message: "Mật khẩu phải chứa ít nhất 8 ký tự." })
+    .regex(/[0-9]/, { message: "Mật khẩu phải chứa ít nhất 1 số." }),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Mật khẩu xác nhận không khớp.",
@@ -48,7 +50,7 @@ export default function RegisterPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
