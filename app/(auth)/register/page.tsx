@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "sonner"
-import { Lock, Mail, User, ShieldCheck, Users } from "lucide-react"
+import { Lock, Mail, User, ShieldCheck, Users, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -36,6 +36,7 @@ const formSchema = z.object({
 export default function RegisterPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,6 +50,7 @@ export default function RegisterPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
+    setErrorMsg(null)
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -61,9 +63,20 @@ export default function RegisterPage() {
         router.push("/login")
       } else {
         const data = await response.json()
-        toast.error(data.message || "Đã xảy ra lỗi.")
+        const errorText = data.message || "Đã xảy ra lỗi."
+        setErrorMsg(errorText)
+        toast.error(errorText)
+
+        // Nếu email đã tồn tại, hiển thị lỗi ngay dưới ô nhập email
+        if (errorText.toLowerCase().includes("email")) {
+          form.setError("email", {
+            type: "manual",
+            message: errorText
+          })
+        }
       }
     } catch (error) {
+      setErrorMsg("Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.")
       toast.error("Đăng ký thất bại. Vui lòng thử lại.")
     } finally {
       setIsLoading(false)
@@ -111,6 +124,16 @@ export default function RegisterPage() {
             <h2 className="text-3xl md:text-4xl font-black text-zinc-900 mb-2">Tạo tài khoản</h2>
             <p className="text-zinc-500 font-medium text-sm">Bắt đầu hành trình học tập của bạn ngay hôm nay.</p>
         </div>
+
+        {errorMsg && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+            <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-red-800">Lỗi đăng ký</h4>
+              <p className="text-xs font-semibold text-red-600 leading-relaxed">{errorMsg}</p>
+            </div>
+          </div>
+        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">

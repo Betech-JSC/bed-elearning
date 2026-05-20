@@ -28,19 +28,24 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: "Tên quá ngắn" }, { status: 400 })
     }
 
+    const userRole = session?.user?.role
+    const isInstructorOrAdmin = userRole === "INSTRUCTOR" || userRole === "ADMIN"
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
         name,
-        bio,
         image,
-        coverImage,
-        portfolioContent,
-        githubUrl,
-        twitterUrl,
-        linkedinUrl,
-        youtubeUrl,
-        websiteUrl
+        ...(isInstructorOrAdmin ? {
+          bio,
+          coverImage,
+          portfolioContent,
+          githubUrl,
+          twitterUrl,
+          linkedinUrl,
+          youtubeUrl,
+          websiteUrl
+        } : {})
       }
     })
 
