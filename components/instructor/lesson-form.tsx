@@ -37,7 +37,7 @@ const formSchema = z.object({
   title: z.string().min(1, "Vui lòng nhập tiêu đề bài học"),
   description: z.string().optional(),
   videoUrl: z.string().optional(),
-  isFreePreview: z.boolean().default(false),
+  isFreePreview: z.boolean(),
 })
 
 type LessonFormValues = z.infer<typeof formSchema>
@@ -51,7 +51,7 @@ export function LessonForm({ courseId, lesson }: LessonFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const form = useForm({
+  const form = useForm<LessonFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: lesson.title || "",

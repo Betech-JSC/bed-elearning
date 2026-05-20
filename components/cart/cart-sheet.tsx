@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useCart } from "@/lib/store/use-cart"
 import { 
   Sheet, 
@@ -17,9 +18,15 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 export function CartSheet() {
+  const [mounted, setMounted] = useState(false)
   const { items, removeItem, getTotalItems, getSubtotal } = useCart()
-  const totalItems = getTotalItems()
-  const subtotal = getSubtotal()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const totalItems = mounted ? getTotalItems() : 0
+  const subtotal = mounted ? getSubtotal() : 0
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price)

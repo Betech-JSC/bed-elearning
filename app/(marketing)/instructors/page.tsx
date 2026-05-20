@@ -16,7 +16,10 @@ async function getInstructors() {
           status: "PUBLISHED"
         },
         include: {
-          category: true
+          category: true,
+          _count: {
+            select: { enrollments: true }
+          }
         }
       },
       reviews: true
@@ -33,13 +36,16 @@ async function getInstructors() {
     // Extract unique category names as expertise
     const expertise = Array.from(new Set(instructor.courses.map(c => c.category?.name).filter(Boolean))).slice(0, 3)
 
+    const totalStudents = instructor.courses.reduce((acc, course) => acc + (course._count?.enrollments || 0), 0)
+    const formattedStudents = totalStudents >= 1000 ? `${Math.floor(totalStudents / 1000)}K+` : `${totalStudents}`
+
     return {
       id: instructor.id,
       name: instructor.name || "Giảng viên Belearning",
       role: instructor.bio?.substring(0, 50) || "Chuyên gia đào tạo",
       image: instructor.image || `https://i.pravatar.cc/150?u=${instructor.id}`,
       courses: instructor.courses.length,
-      students: "1,000+", 
+      students: formattedStudents, 
       rating: averageRating.toFixed(1),
       bio: instructor.bio || "Đội ngũ giảng viên tâm huyết tại Belearning.",
       expertise: expertise.length > 0 ? expertise : ["Giảng dạy", "Chuyên gia"]

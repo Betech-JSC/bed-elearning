@@ -11,7 +11,18 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-    const { name, bio } = await req.json()
+    const { 
+      name, 
+      bio, 
+      image,
+      coverImage,
+      portfolioContent,
+      githubUrl,
+      twitterUrl,
+      linkedinUrl,
+      youtubeUrl,
+      websiteUrl
+    } = await req.json()
 
     if (name && name.length < 2) {
       return NextResponse.json({ message: "Tên quá ngắn" }, { status: 400 })
@@ -21,7 +32,15 @@ export async function PATCH(req: Request) {
       where: { id: userId },
       data: {
         name,
-        bio
+        bio,
+        image,
+        coverImage,
+        portfolioContent,
+        githubUrl,
+        twitterUrl,
+        linkedinUrl,
+        youtubeUrl,
+        websiteUrl
       }
     })
 
@@ -29,7 +48,15 @@ export async function PATCH(req: Request) {
       message: "Cập nhật thành công",
       user: {
         name: updatedUser.name,
-        bio: updatedUser.bio
+        bio: updatedUser.bio,
+        image: updatedUser.image,
+        coverImage: updatedUser.coverImage,
+        portfolioContent: updatedUser.portfolioContent,
+        githubUrl: updatedUser.githubUrl,
+        twitterUrl: updatedUser.twitterUrl,
+        linkedinUrl: updatedUser.linkedinUrl,
+        youtubeUrl: updatedUser.youtubeUrl,
+        websiteUrl: updatedUser.websiteUrl
       }
     })
 

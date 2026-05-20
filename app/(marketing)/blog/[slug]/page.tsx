@@ -62,12 +62,11 @@ export default async function BlogPostPage({
           </div>
         )}
 
-        <div className="prose prose-lg dark:prose-invert max-w-none">
-          {/* Note: In a real app, article.content would likely be HTML from a Rich Text Editor. 
-              Here we just render it as text for MVP purposes. */}
-          <div className="whitespace-pre-wrap leading-relaxed text-zinc-700 dark:text-zinc-300">
-            {article.content}
-          </div>
+        <div className="prose prose-orange max-w-none text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
+          <div 
+            dangerouslySetInnerHTML={{ __html: article.content }} 
+            className="space-y-4"
+          />
         </div>
       </div>
     </article>

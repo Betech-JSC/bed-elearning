@@ -15,7 +15,11 @@ import {
   LayoutDashboard,
   Bell,
   ShoppingCart,
-  ArrowRight
+  ArrowRight,
+  Check,
+  Trash2,
+  Clock,
+  Award
 } from "lucide-react"
 import { 
   DropdownMenu, 
@@ -27,12 +31,82 @@ import {
 import { signOut, useSession } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { CartSheet } from "@/components/cart/cart-sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { toast } from "sonner"
+import { 
+  getNotifications, 
+  markAllNotificationsAsRead, 
+  markNotificationAsRead, 
+  clearAllNotifications 
+} from "@/lib/actions/notifications"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const { data: session } = useSession()
+  
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+
+  const user = session?.user
+
+  const unreadCount = notifications.filter(n => !n.isRead).length
+
+  useEffect(() => {
+    if (!user) {
+      setNotifications([])
+      return
+    }
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await getNotifications()
+        if (res && res.success && res.notifications) {
+          setNotifications(res.notifications)
+        }
+      } catch (error) {
+        console.error("Failed to load notifications:", error)
+      }
+    }
+
+    fetchNotifications()
+    const interval = setInterval(fetchNotifications, 30000)
+    return () => clearInterval(interval)
+  }, [user])
+
+  const handleMarkAllAsRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+    toast.success("Đã đánh dấu đọc tất cả thông báo!")
+    
+    const res = await markAllNotificationsAsRead()
+    if (res && !res.success) {
+      toast.error("Lỗi kết nối: Không thể cập nhật trạng thái trên hệ thống.")
+    }
+  }
+
+  const handleClearNotifications = async () => {
+    setNotifications([])
+    toast.success("Đã xóa tất cả thông báo!")
+    
+    const res = await clearAllNotifications()
+    if (res && !res.success) {
+      toast.error("Lỗi kết nối: Không thể xóa thông báo trên hệ thống.")
+    }
+  }
+
+  const handleNotificationClick = async (id: string) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === id ? { ...n, isRead: true } : n))
+    )
+    
+    if (id !== "welcome" && id !== "streak") {
+      const res = await markNotificationAsRead(id)
+      if (res && !res.success) {
+        toast.error("Lỗi kết nối: Không thể cập nhật thông báo trên hệ thống.")
+      }
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,8 +124,6 @@ export function Navbar() {
     { label: "Blog", href: "/blog" },
     { label: "Về chúng tôi", href: "/about" },
   ]
-
-  const user = session?.user
 
   // Hide Navbar on Learn pages (Video player)
   if (pathname.startsWith("/learn/")) return null
@@ -116,9 +188,18 @@ export function Navbar() {
            <div className="flex items-center gap-4">
               {user ? (
                  <div className="flex items-center gap-4">
-                    <button className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 hover:text-[#FF6600] transition-all">
-                        <Bell className="w-5 h-5" />
-                    </button>
+                     <button 
+                       onClick={() => setIsNotificationsOpen(true)}
+                       className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 hover:text-[#FF6600] transition-all relative group"
+                       title="Thông báo"
+                     >
+                         <Bell className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                         {unreadCount > 0 && (
+                           <span className="absolute -top-1 -right-1 min-w-[18px] h-4.5 px-1 bg-red-500 rounded-full border border-white text-[8px] font-black text-white flex items-center justify-center animate-bounce">
+                             {unreadCount}
+                           </span>
+                         )}
+                     </button>
                     <DropdownMenu>
                         <DropdownMenuTrigger className="focus:outline-none">
                             <Avatar className="w-10 h-10 border-2 border-white shadow-lg cursor-pointer hover:scale-105 transition-transform ring-2 ring-zinc-50">
@@ -237,6 +318,112 @@ export function Navbar() {
            )}
         </div>
       )}
+      {/* NOTIFICATIONS SLIDE DRAWER (SHEET) */}
+      <Sheet open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md rounded-l-[3rem] p-8 flex flex-col h-full overflow-hidden bg-white z-[99999] border-l border-zinc-100">
+          <SheetHeader className="border-b pb-6 shrink-0">
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-2xl font-black text-zinc-900 flex items-center gap-2">
+                <Bell className="w-6 h-6 text-[#FF6600]" />
+                Thông báo của bạn
+              </SheetTitle>
+              {unreadCount > 0 && (
+                <span className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-wider">
+                  {unreadCount} Mới
+                </span>
+              )}
+            </div>
+          </SheetHeader>
+
+          {/* NOTIFICATION LIST */}
+          <div className="flex-1 overflow-y-auto py-6 space-y-4 pr-1">
+            {notifications.length > 0 ? (
+              <div className="space-y-3">
+                {notifications.map((notif) => (
+                  <div
+                    key={notif.id}
+                    onClick={() => handleNotificationClick(notif.id)}
+                    className={cn(
+                      "p-5 rounded-3xl border transition-all relative group flex flex-col gap-2 cursor-pointer",
+                      notif.isRead
+                        ? "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200"
+                        : "bg-orange-50/20 border-orange-100 text-zinc-900 font-medium hover:bg-orange-50/30"
+                    )}
+                  >
+                    {!notif.isRead && (
+                      <span className="absolute top-5 right-5 w-2 h-2 bg-[#FF6600] rounded-full" />
+                    )}
+
+                    <div className="flex items-start gap-3">
+                      <div className={cn(
+                        "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 shadow-sm",
+                        notif.isRead ? "bg-zinc-100 text-zinc-400" : "bg-white text-[#FF6600] border border-orange-100"
+                      )}>
+                        {notif.id === "welcome" ? <Award className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+                      </div>
+                      <div className="space-y-1 pr-4">
+                        <h4 className="font-bold text-sm leading-snug">{notif.title}</h4>
+                        <p className="text-xs text-zinc-500 leading-relaxed font-medium">{notif.message}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-zinc-100/50">
+                      <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                        {typeof notif.createdAt === 'string' 
+                          ? new Date(notif.createdAt).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' }) 
+                          : notif.createdAt.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+
+                      {notif.link && (
+                        <Link
+                          href={notif.link}
+                          onClick={() => setIsNotificationsOpen(false)}
+                          className="text-[10px] font-black text-[#FF6600] uppercase tracking-wider hover:underline flex items-center gap-1"
+                        >
+                          Xem chi tiết &rarr;
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 space-y-4">
+                <div className="w-16 h-16 bg-zinc-50 rounded-2xl flex items-center justify-center mx-auto text-zinc-300">
+                  <Bell className="w-8 h-8" />
+                </div>
+                <div>
+                  <p className="font-bold text-zinc-500">Không có thông báo mới</p>
+                  <p className="text-xs text-zinc-400 mt-1 max-w-[200px] mx-auto leading-relaxed">
+                    Mọi thông báo về khóa học, tiến độ và tin nhắn sẽ được hiển thị tại đây.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* FOOTER ACTIONS */}
+          {notifications.length > 0 && (
+            <div className="border-t pt-6 mt-auto shrink-0 flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleMarkAllAsRead}
+                className="flex-1 h-12 rounded-xl text-xs font-black uppercase tracking-wider border-zinc-200 text-zinc-700 bg-white hover:bg-zinc-50"
+              >
+                <Check className="w-4 h-4 mr-2" /> Đọc tất cả
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={handleClearNotifications}
+                className="h-12 w-12 rounded-xl border border-zinc-200 text-red-500 hover:text-red-600 hover:bg-red-50/50 flex items-center justify-center shrink-0"
+                title="Xóa tất cả"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </nav>
   )
 }

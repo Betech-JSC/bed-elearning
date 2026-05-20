@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Star, Users, ShoppingCart, Zap, Award } from "lucide-react"
+import { Star, Users, ShoppingCart, Award } from "lucide-react"
 import { useCart } from "@/lib/store/use-cart"
 import { useRouter } from "next/navigation"
 import { WishlistButton } from "@/components/course/wishlist-button"
@@ -26,8 +26,15 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
   const router = useRouter()
   const { data: session, status } = useSession()
   
-  const formattedPrice = course.price === 0 
+  const isDiscounted = course.salePrice > 0 && course.salePrice < course.price
+  const currentPrice = isDiscounted ? course.salePrice : course.price
+  
+  const formattedPrice = currentPrice === 0 
     ? "Miễn phí" 
+    : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentPrice)
+
+  const formattedOriginalPrice = course.price === 0
+    ? "Miễn phí"
     : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)
 
   const levelText: Record<string, string> = {
@@ -52,7 +59,7 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
       id: course.id,
       title: course.title,
       slug: course.slug,
-      price: course.price,
+      price: currentPrice,
       thumbnail: course.thumbnail,
       instructorName: course.instructor?.name || "",
     })
@@ -71,7 +78,7 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
       id: course.id,
       title: course.title,
       slug: course.slug,
-      price: course.price,
+      price: currentPrice,
       thumbnail: course.thumbnail,
       instructorName: course.instructor?.name || "",
     })
@@ -105,8 +112,13 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         
         {/* Price Badge */}
-        <div className="absolute top-3 right-3">
-          <Badge className="bg-[#FF6600] text-white border-none font-black px-3 py-1.5 rounded-xl shadow-lg">
+        <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-10">
+          {isDiscounted && (
+            <Badge className="bg-red-500 text-white border-none font-black text-[9px] px-2 py-0.5 rounded-lg shadow-md uppercase tracking-wider">
+              -{Math.round((1 - course.salePrice / course.price) * 100)}% OFF
+            </Badge>
+          )}
+          <Badge className="bg-[#FF6600] text-white border-none font-black px-3 py-1.5 rounded-xl shadow-lg text-xs">
             {formattedPrice}
           </Badge>
         </div>
@@ -131,7 +143,7 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
                 <Star className="w-3 h-3 fill-orange-500 text-orange-500" />
                 <span className="text-[10px] font-black text-orange-700 dark:text-orange-400">{rating > 0 ? rating.toFixed(1) : "5.0"}</span>
             </div>
-            <span className="text-[10px] text-zinc-400 font-medium">(2.3k reviews)</span>
+            <span className="text-[10px] text-zinc-400 font-medium">({course.reviews?.length ?? 0} đánh giá)</span>
         </div>
 
         <Link href={`/courses/${course.slug}`} className="hover:text-[#FF6600] transition-colors mb-2">
@@ -175,14 +187,16 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
           ) : (
             <div className="flex flex-col gap-4">
                <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-4">
-                  <div className="flex items-center gap-4">
-                     <div className="flex items-center gap-1.5 text-zinc-400">
+                  <div className="flex flex-col">
+                     <div className="flex items-center gap-1.5 text-zinc-400 mb-1">
                         <Users className="w-3.5 h-3.5" />
                         <span className="text-[11px] font-bold">{totalStudents}</span>
                      </div>
-                     <div className="flex items-center gap-1.5 text-zinc-400">
-                        <Zap className="w-3.5 h-3.5" />
-                        <span className="text-[11px] font-bold">12h</span>
+                     <div className="flex items-baseline gap-1.5">
+                        <span className="text-sm font-black text-[#FF6600]">{formattedPrice}</span>
+                        {isDiscounted && (
+                           <span className="text-[10px] text-zinc-400 line-through font-bold">{formattedOriginalPrice}</span>
+                        )}
                      </div>
                   </div>
                   <div className="flex gap-2">
@@ -200,9 +214,9 @@ export function CourseCard({ course, rating = 0, totalStudents = 0, isMyCourse, 
                       <Button
                         onClick={handleBuyNow}
                         size="sm"
-                        className="rounded-xl px-4 bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 font-bold text-[11px]"
+                        className="rounded-xl px-4 bg-[#FF6600] text-white hover:bg-orange-600 font-bold text-[11px] border-none shadow-md shadow-orange-500/10"
                       >
-                        Đăng ký
+                        {currentPrice === 0 ? "Học miễn phí" : "Mua ngay"}
                       </Button>
                   </div>
                </div>

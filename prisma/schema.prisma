@@ -17,6 +17,13 @@ model User {
   role            Role          @default(STUDENT)
   status          UserStatus    @default(ACTIVE)
   bio             String?
+  coverImage      String?
+  portfolioContent String?
+  githubUrl       String?
+  twitterUrl      String?
+  linkedinUrl     String?
+  youtubeUrl      String?
+  websiteUrl      String?
   failedAttempts  Int           @default(0)
   lastFailedLogin DateTime?
   xp              Int           @default(0)

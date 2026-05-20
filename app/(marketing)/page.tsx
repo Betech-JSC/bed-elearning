@@ -2,10 +2,8 @@ import prisma from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { 
-  Search, 
   ArrowRight, 
   Play, 
-  Users, 
   Star, 
   CheckCircle,
   Layout,
@@ -14,30 +12,48 @@ import {
   Cloud,
   Database,
   Bot,
-  BookOpen,
   Sparkles,
   Zap,
   Award,
-  Globe
+  Globe,
+  TrendingUp
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { CourseCard } from "@/components/ui-custom/course-card"
 
+function formatStat(n: number): string {
+  if (n >= 1000) return `${Math.floor(n / 1000)}K+`
+  if (n > 0) return `${n}+`
+  return "0"
+}
+
 export default async function HomePage() {
-  const featuredCourses = await prisma.course.findMany({
-    where: { isFeatured: true, status: "PUBLISHED" },
-    include: {
-      instructor: true,
-      category: true,
-      reviews: true,
-      _count: {
-        select: { enrollments: true }
-      }
-    },
-    take: 8
-  })
+  const [featuredCourses, enrollmentCount, courseCount, instructorCount, globalSettings] = await Promise.all([
+    prisma.course.findMany({
+      where: { isFeatured: true, status: "PUBLISHED" },
+      include: {
+        instructor: true,
+        category: true,
+        reviews: true,
+        _count: {
+          select: { enrollments: true }
+        }
+      },
+      take: 8
+    }),
+    prisma.enrollment.count(),
+    prisma.course.count({ where: { status: "PUBLISHED" } }),
+    prisma.user.count({ where: { role: "INSTRUCTOR" } }),
+    prisma.globalSettings.findUnique({ where: { id: "global" } })
+  ])
+
+  const studentLabel = formatStat(enrollmentCount)
+  const courseLabel = formatStat(courseCount)
+  const instructorLabel = formatStat(instructorCount)
+
+  const heroImageSrc = globalSettings?.bannerImage || "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=80"
 
   return (
     <div className="flex flex-col bg-white">
@@ -75,19 +91,22 @@ export default async function HomePage() {
               </Button>
             </div>
             
+            {/* Real stats row */}
             <div className="flex items-center gap-10 pt-6 border-t border-zinc-50">
-                <div className="flex -space-x-4">
-                    {[1,2,3,4].map(i => (
-                        <div key={i} className="w-12 h-12 rounded-full border-4 border-white overflow-hidden bg-zinc-100">
-                            <Image src={`https://i.pravatar.cc/100?u=user-${i}`} alt="User" width={48} height={48} />
-                        </div>
-                    ))}
-                </div>
-                <div className="space-y-1">
-                    <p className="text-sm font-black text-zinc-900">10,000+ Học viên</p>
-                    <div className="flex items-center gap-1">
-                        {[1,2,3,4,5].map(s => <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}
-                        <span className="text-[10px] font-bold text-zinc-400 ml-2">4.9/5 RATING</span>
+                <div className="flex gap-8">
+                    <div className="text-center">
+                         <p className="text-2xl font-black text-zinc-900">{studentLabel}</p>
+                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Học viên</p>
+                    </div>
+                    <div className="w-px bg-zinc-100" />
+                    <div className="text-center">
+                        <p className="text-2xl font-black text-[#FF6600]">{courseLabel}</p>
+                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Khóa học</p>
+                    </div>
+                    <div className="w-px bg-zinc-100" />
+                    <div className="text-center">
+                        <p className="text-2xl font-black text-zinc-900">{instructorLabel}</p>
+                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Giảng viên</p>
                     </div>
                 </div>
             </div>
@@ -96,7 +115,7 @@ export default async function HomePage() {
           <div className="relative animate-in fade-in slide-in-from-right-12 duration-1000 delay-200">
              <div className="relative rounded-[4rem] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border-[12px] border-white group">
                 <Image 
-                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=80" 
+                    src={heroImageSrc} 
                     alt="Belearning Hero" 
                     width={800} 
                     height={800} 
@@ -107,20 +126,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* STATS STRIP */}
+      {/* STATS STRIP - dùng cùng data với hero */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-6">
             <div className="bg-[#F8F9FA] rounded-[3.5rem] p-12 grid grid-cols-2 md:grid-cols-4 gap-12 border border-zinc-100">
                 <div className="text-center space-y-2">
-                    <p className="text-5xl font-black text-zinc-900 tracking-tighter">50K+</p>
+                    <p className="text-5xl font-black text-zinc-900 tracking-tighter">{studentLabel}</p>
                     <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Học viên</p>
                 </div>
                 <div className="text-center space-y-2">
-                    <p className="text-5xl font-black text-[#FF6600] tracking-tighter">1.2K+</p>
+                    <p className="text-5xl font-black text-[#FF6600] tracking-tighter">{courseLabel}</p>
                     <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Khóa học</p>
                 </div>
                 <div className="text-center space-y-2">
-                    <p className="text-5xl font-black text-zinc-900 tracking-tighter">450+</p>
+                    <p className="text-5xl font-black text-zinc-900 tracking-tighter">{instructorLabel}</p>
                     <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Giảng viên</p>
                 </div>
                 <div className="text-center space-y-2">
@@ -179,16 +198,23 @@ export default async function HomePage() {
                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-            {featuredCourses.map((course) => (
-              <CourseCard 
-                key={course.id} 
-                course={course} 
-                rating={course.reviews.length > 0 ? (course.reviews.reduce((a, b) => a + b.rating, 0) / course.reviews.length) : 5.0}
-                totalStudents={course._count.enrollments}
-              />
-            ))}
-          </div>
+          {featuredCourses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+              {featuredCourses.map((course) => (
+                <CourseCard 
+                  key={course.id} 
+                  course={course} 
+                  rating={course.reviews.length > 0 ? (course.reviews.reduce((a, b) => a + b.rating, 0) / course.reviews.length) : 0}
+                  totalStudents={course._count.enrollments}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-24 text-zinc-400">
+              <TrendingUp className="w-16 h-16 mx-auto mb-4 opacity-20" />
+              <p className="font-medium">Các khóa học nổi bật sẽ sớm xuất hiện tại đây.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -201,11 +227,11 @@ export default async function HomePage() {
            <div className="relative z-10 space-y-12 max-w-3xl mx-auto">
               <h2 className="text-5xl md:text-7xl font-black tracking-tight leading-tight">Sẵn sàng bắt đầu hành trình của bạn?</h2>
               <p className="text-zinc-400 text-xl font-medium leading-relaxed">
-                 Tham gia cùng hơn 10.000 học viên khác và nhận quyền truy cập trọn đời vào tất cả tài liệu học tập của chúng tôi.
+                 Tham gia cùng hàng nghìn học viên và khám phá các khóa học từ chuyên gia hàng đầu. Học bất cứ lúc nào, bất cứ đâu.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center pt-6">
                 <Button asChild size="lg" className="bg-[#FF6600] text-white hover:bg-orange-600 h-18 px-12 rounded-[2rem] font-black text-lg shadow-2xl shadow-orange-500/30 transition-all border-none">
-                  <Link href="/register">Đăng ký ngay - Miễn phí</Link>
+                  <Link href="/courses">Khám phá khóa học ngay</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-18 px-12 rounded-[2rem] font-black text-lg border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all text-white">
                   <Link href="/about">Tìm hiểu thêm</Link>
@@ -217,3 +243,4 @@ export default async function HomePage() {
     </div>
   )
 }
+

@@ -21,6 +21,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { QnaSection } from "@/components/player/qna-section"
 import { NotesSection } from "@/components/player/notes-section"
+import { InteractiveQuiz } from "@/components/player/interactive-quiz"
 
 export default async function LessonPage({
   params
@@ -274,43 +275,7 @@ export default async function LessonPage({
 
                     {lesson.quiz && (
                         <TabsContent value="quiz" className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-8 md:p-10 rounded-[3rem] shadow-sm overflow-hidden relative group">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-50 dark:bg-purple-950/10 rounded-bl-full -z-0 opacity-50" />
-                                <div className="relative z-10">
-                                    <h3 className="text-2xl font-black mb-2 text-zinc-900 dark:text-zinc-100">{lesson.quiz.title}</h3>
-                                    <p className="text-zinc-500 dark:text-zinc-400 font-medium mb-8 max-w-lg leading-relaxed text-sm">Bạn cần đạt ít nhất <span className="text-purple-600 font-black">{lesson.quiz.passingScore}%</span> điểm để vượt qua bài kiểm tra này.</p>
-                                    
-                                    {lesson.quiz.questions.length === 0 ? (
-                                        <div className="bg-[#F8F9FA] dark:bg-zinc-950/40 p-8 rounded-3xl text-center flex flex-col items-center gap-4">
-                                            <div className="w-14 h-14 bg-white dark:bg-zinc-900 rounded-2xl flex items-center justify-center shadow-sm">
-                                               <Info className="w-6 h-6 text-zinc-200 dark:text-zinc-700" />
-                                            </div>
-                                            <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Bài kiểm tra đang cập nhật nội dung</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-8">
-                                            <div className="space-y-6">
-                                                {lesson.quiz.questions.map((question, i) => (
-                                                    <div key={question.id} className="bg-[#F8F9FA] dark:bg-zinc-950/20 p-6 md:p-8 rounded-[2rem] border border-transparent hover:border-purple-100 dark:hover:border-purple-900/50 transition-all space-y-4">
-                                                        <h4 className="font-black text-base text-zinc-900 dark:text-zinc-100"><span className="text-purple-600 mr-3">Câu {i + 1}</span>{question.prompt}</h4>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                            {question.options.map(opt => (
-                                                                <div key={opt.id} className="flex items-center gap-3.5 p-4 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl hover:border-purple-200 dark:hover:border-purple-950/50 hover:shadow-lg hover:shadow-purple-500/5 cursor-pointer transition-all group/opt">
-                                                                    <div className="w-5 h-5 rounded-lg border-2 border-zinc-100 dark:border-zinc-800 flex-shrink-0 group-hover/opt:border-purple-300 transition-colors" />
-                                                                    <span className="text-xs md:text-sm font-bold text-zinc-600 dark:text-zinc-400 group-hover/opt:text-zinc-900 dark:group-hover/opt:text-zinc-100">{opt.text}</span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <Button className="rounded-[1.25rem] font-black bg-purple-600 hover:bg-purple-700 h-14 px-10 shadow-xl shadow-purple-500/20 uppercase tracking-widest text-xs">
-                                                Nộp bài
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                            <InteractiveQuiz quiz={lesson.quiz} />
                         </TabsContent>
                     )}
                 </Tabs>

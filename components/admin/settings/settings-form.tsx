@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { updateGlobalSettings } from "@/lib/actions/admin"
 import { toast } from "sonner"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Image as ImageIcon } from "lucide-react"
 
 const formSchema = z.object({
   platformFee: z.coerce.number().min(0).max(100),
@@ -103,9 +104,50 @@ export const SettingsForm = ({ initialData, courses }: SettingsFormProps) => {
             name="bannerImage"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">Ảnh Banner (URL)</FormLabel>
+                <FormLabel className="font-bold">Ảnh Banner trang chủ (Featured Image)</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="https://..." className="rounded-xl" />
+                  <div className="space-y-4">
+                    <div className="flex gap-4">
+                      <Input 
+                        {...field} 
+                        value={field.value || ""}
+                        placeholder="Dán link ảnh hoặc tải lên ở bên phải..." 
+                        className="rounded-xl" 
+                      />
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          id="banner-image-upload"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                field.onChange(reader.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                        <Button 
+                          type="button" 
+                          variant="secondary" 
+                          className="rounded-xl gap-2 h-10 shrink-0"
+                          onClick={() => document.getElementById('banner-image-upload')?.click()}
+                        >
+                          <ImageIcon className="w-4 h-4" />
+                          Tải lên
+                        </Button>
+                      </div>
+                    </div>
+                    {field.value && (
+                      <div className="relative aspect-[21/9] w-full rounded-2xl overflow-hidden border shadow-sm max-w-xl bg-zinc-50">
+                        <img src={field.value} alt="Banner Preview" className="object-cover w-full h-full" />
+                      </div>
+                    )}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

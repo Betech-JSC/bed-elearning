@@ -102,16 +102,16 @@ export default function InstructorApplicationPage() {
 
                 <div className="relative rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white group">
                     <Image 
-                        src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop" 
-                        alt="Testimonial" 
+                        src="/nguyen-cong-toan.png" 
+                        alt="Anh Nguyễn Công Toàn - Giám đốc Betech" 
                         width={600} 
                         height={600} 
-                        className="w-full h-[400px] object-cover group-hover:scale-105 transition-transform duration-1000"
+                        className="w-full h-[450px] object-cover object-top group-hover:scale-105 transition-transform duration-1000"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
                     <div className="absolute bottom-10 left-10 right-10">
-                        <p className="text-white font-bold italic text-lg leading-relaxed mb-4">
-                            &quot;Belearning đã mang đến cho tôi một nền tảng tuyệt vời để lan tỏa kiến thức vượt ra ngoài không gian lớp học truyền thống.&quot; — TS. Sarah Chen
+                        <p className="text-white font-bold italic text-base leading-relaxed mb-4">
+                            &quot;Tại Betech, chúng tôi tin rằng công nghệ và giáo dục số là chìa khóa mở ra tương lai. Belearning chính là cầu nối tuyệt vời để lan tỏa những giá trị tri thức thực chiến đến với cộng đồng học viên.&quot; — Anh Nguyễn Công Toàn, Giám đốc Betech
                         </p>
                         <div className="flex gap-1">
                             {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 text-orange-400 fill-orange-400" />)}

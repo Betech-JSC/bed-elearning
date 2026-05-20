@@ -55,6 +55,7 @@ export default async function CoursesPage({
 
   if (priceFilter) {
     if (priceFilter === "free") where.price = 0
+    else if (priceFilter === "sale") where.salePrice = { gt: 0 }
     else if (priceFilter === "under_500") where.price = { gt: 0, lte: 500000 }
     else if (priceFilter === "500_2m") where.price = { gt: 500000, lte: 2000000 }
     else if (priceFilter === "over_2m") where.price = { gt: 2000000 }
@@ -72,7 +73,12 @@ export default async function CoursesPage({
   const session = await auth()
   const userId = session?.user?.id
 
-  const [courses, categories] = await Promise.all([
+  const pageParam = typeof resolvedParams.page === "string" ? parseInt(resolvedParams.page) : 1
+  const page = isNaN(pageParam) || pageParam < 1 ? 1 : pageParam
+  const limit = 9
+  const skip = (page - 1) * limit
+
+  const [courses, totalCount, categories] = await Promise.all([
     prisma.course.findMany({
       where,
       orderBy,
@@ -86,10 +92,25 @@ export default async function CoursesPage({
           select: { enrollments: true }
         }
       },
-      take: 24,
+      skip,
+      take: limit,
     }),
+    prisma.course.count({ where }),
     prisma.category.findMany()
   ])
+
+  const totalPages = Math.ceil(totalCount / limit)
+
+  const getPageUrl = (pageNumber: number) => {
+    const params = new URLSearchParams()
+    if (q) params.set("q", q)
+    if (sort) params.set("sort", sort)
+    if (priceFilter) params.set("price", priceFilter)
+    if (categoriesFilter.length > 0) params.set("category", categoriesFilter.join(","))
+    if (levelsFilter.length > 0) params.set("level", levelsFilter.join(","))
+    params.set("page", pageNumber.toString())
+    return `/courses?${params.toString()}`
+  }
 
   return (
     <div className="bg-[#F8F9FA] min-h-screen pt-32 pb-24">
@@ -131,8 +152,8 @@ export default async function CoursesPage({
                 <div className="relative z-10 space-y-4">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400">Ưu đãi hôm nay</p>
                     <h4 className="text-2xl font-black leading-tight">Giảm đến 50% <br/> cho khóa học mới</h4>
-                    <Button className="w-full h-12 rounded-xl bg-[#FF6600] hover:bg-orange-600 font-black text-xs uppercase tracking-widest border-none text-white">
-                        Xem ngay
+                    <Button asChild className="w-full h-12 rounded-xl bg-[#FF6600] hover:bg-orange-600 font-black text-xs uppercase tracking-widest border-none text-white shadow-lg shadow-orange-500/10">
+                        <Link href="/courses?price=sale">Xem ngay</Link>
                     </Button>
                 </div>
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl" />
@@ -185,13 +206,51 @@ export default async function CoursesPage({
               </div>
             )}
             
-            {/* Pagination Placeholder */}
-            {courses.length >= 24 && (
-                <div className="pt-12 text-center">
-                    <Button variant="outline" className="h-16 px-10 rounded-2xl border-zinc-200 font-black text-xs uppercase tracking-widest hover:bg-zinc-50">
-                        Tải thêm khóa học
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="pt-12 flex items-center justify-center gap-2">
+                <Button 
+                  asChild 
+                  variant="outline" 
+                  disabled={page === 1}
+                  className={cn(
+                    "w-12 h-12 rounded-xl border-zinc-200 p-0 font-bold", 
+                    page === 1 && "pointer-events-none opacity-50"
+                  )}
+                >
+                  <Link href={getPageUrl(page - 1)}>&lt;</Link>
+                </Button>
+
+                {Array.from({ length: totalPages }).map((_, idx) => {
+                  const pNum = idx + 1
+                  const isCurrent = pNum === page
+                  return (
+                    <Button
+                      key={pNum}
+                      asChild
+                      variant={isCurrent ? "default" : "outline"}
+                      className={cn(
+                        "w-12 h-12 rounded-xl font-bold",
+                        isCurrent ? "bg-[#FF6600] text-white hover:bg-orange-600 border-none" : "border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                      )}
+                    >
+                      <Link href={getPageUrl(pNum)}>{pNum}</Link>
                     </Button>
-                </div>
+                  )
+                })}
+
+                <Button 
+                  asChild 
+                  variant="outline" 
+                  disabled={page === totalPages}
+                  className={cn(
+                    "w-12 h-12 rounded-xl border-zinc-200 p-0 font-bold", 
+                    page === totalPages && "pointer-events-none opacity-50"
+                  )}
+                >
+                  <Link href={getPageUrl(page + 1)}>&gt;</Link>
+                </Button>
+              </div>
             )}
           </main>
         </div>

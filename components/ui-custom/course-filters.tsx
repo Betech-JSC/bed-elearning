@@ -20,6 +20,7 @@ const sortLabels: Record<string, string> = {
 const priceLabels: Record<string, string> = {
   all: "Tất cả mức giá",
   free: "Miễn phí",
+  sale: "Đang khuyến mãi 🔥",
   under_500: "Dưới 500.000đ",
   "500_2m": "500.000đ - 2.000.000đ",
   over_2m: "Trên 2.000.000đ",
@@ -46,6 +47,7 @@ export function CourseFilters({ categories }: { categories: Category[] }) {
     } else {
       params.delete("q")
     }
+    params.delete("page")
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`)
     })
@@ -58,6 +60,7 @@ export function CourseFilters({ categories }: { categories: Category[] }) {
     } else {
       params.delete(key)
     }
+    params.delete("page")
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`)
     })
@@ -79,6 +82,7 @@ export function CourseFilters({ categories }: { categories: Category[] }) {
     } else {
       params.delete(key)
     }
+    params.delete("page")
 
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`)
@@ -181,6 +185,7 @@ export function CourseFilters({ categories }: { categories: Category[] }) {
           <SelectContent className="rounded-2xl border border-zinc-100 shadow-2xl bg-white p-2 z-[100] min-w-[200px]">
             <SelectItem value="all" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Tất cả mức giá</SelectItem>
             <SelectItem value="free" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Miễn phí</SelectItem>
+            <SelectItem value="sale" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Đang khuyến mãi 🔥</SelectItem>
             <SelectItem value="under_500" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Dưới 500.000đ</SelectItem>
             <SelectItem value="500_2m" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">500.000đ - 2.000.000đ</SelectItem>
             <SelectItem value="over_2m" className="cursor-pointer rounded-xl py-2.5 px-3 hover:bg-zinc-50 focus:bg-zinc-50 font-bold text-zinc-600 data-[highlighted]:bg-zinc-50 data-[highlighted]:text-zinc-900 data-[selected]:bg-[#FF6600]/10 data-[selected]:text-[#FF6600]">Trên 2.000.000đ</SelectItem>

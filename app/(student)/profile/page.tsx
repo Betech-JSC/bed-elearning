@@ -181,8 +181,10 @@ export default async function ProfilePage() {
                                 <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Issued Date</span>
                                 <span className="text-xs font-black text-zinc-900">{new Date(cert.issuedAt).toLocaleDateString("vi-VN")}</span>
                             </div>
-                            <Button className="w-full h-12 rounded-xl bg-purple-600 hover:bg-purple-700 font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-purple-500/20">
-                                Download Certificate
+                            <Button asChild className="w-full h-12 rounded-xl bg-purple-600 hover:bg-purple-700 font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-purple-500/20">
+                                <Link href={`/certifications/${cert.certificateId}`}>
+                                    Download Certificate
+                                </Link>
                             </Button>
                         </div>
                       </div>

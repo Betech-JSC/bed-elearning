@@ -1,12 +1,24 @@
 import Image from "next/image"
+import Link from "next/link"
 import { Star, Users, BookOpen, Award, Globe, ShieldCheck, Sparkles } from "lucide-react"
+import prisma from "@/lib/prisma"
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const instructors = await prisma.user.findMany({
+    where: { role: "INSTRUCTOR", status: "ACTIVE" },
+    take: 6,
+  })
+
+  // Fetch actual real counts from Database
+  const studentCount = await prisma.user.count({ where: { role: "STUDENT" } })
+  const courseCount = await prisma.course.count({ where: { status: "PUBLISHED" } })
+  const instructorCount = await prisma.user.count({ where: { role: "INSTRUCTOR", status: "ACTIVE" } })
+
   const stats = [
-    { label: "Học viên", value: "50,000+", icon: Users },
-    { label: "Khóa học", value: "1,200+", icon: BookOpen },
-    { label: "Giảng viên", value: "500+", icon: Star },
-    { label: "Quốc gia", value: "15+", icon: Globe },
+    { label: "Học viên", value: `${studentCount}+`, icon: Users },
+    { label: "Khóa học", value: `${courseCount}+`, icon: BookOpen },
+    { label: "Giảng viên", value: `${instructorCount}+`, icon: Star },
+    { label: "Quốc gia", value: "1+", icon: Globe },
   ]
 
   const values = [
@@ -112,28 +124,28 @@ export default function AboutPage() {
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 pt-10">
-            {[1,2,3,4,5,6].map(i => (
-                <div key={i} className="space-y-6 group cursor-pointer">
+            {instructors.map(instructor => (
+                <Link href={`/instructors/${instructor.id}`} key={instructor.id} className="space-y-6 group cursor-pointer block">
                     <div className="relative rounded-[2.5rem] overflow-hidden aspect-square shadow-xl group-hover:scale-105 transition-transform duration-500 bg-zinc-100">
                         <Image 
-                            src={`https://i.pravatar.cc/300?u=team-${i}`} 
-                            alt="Team Member" 
+                            src={instructor.image || `https://i.pravatar.cc/300?u=${instructor.id}`} 
+                            alt={instructor.name || "Giảng viên"} 
                             fill 
                             className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                         />
                     </div>
                     <div>
-                        <p className="font-black text-zinc-900 text-base">Thành viên {i}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mt-1">Hội đồng cố vấn</p>
+                        <p className="font-black text-zinc-900 text-base">{instructor.name || "Giảng viên"}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mt-1 line-clamp-1">{instructor.bio || "Chuyên gia đào tạo"}</p>
                     </div>
-                </div>
+                </Link>
             ))}
         </div>
 
         <div className="pt-16">
-            <button className="h-16 px-12 rounded-full bg-zinc-900 text-white font-black text-xs uppercase tracking-widest hover:bg-[#FF6600] transition-all shadow-xl shadow-zinc-200">
+            <Link href="/instructors" className="inline-flex items-center justify-center h-16 px-12 rounded-full bg-zinc-900 text-white font-black text-xs uppercase tracking-widest hover:bg-[#FF6600] transition-all shadow-xl shadow-zinc-200">
                 Tìm hiểu về đội ngũ của chúng tôi
-            </button>
+            </Link>
         </div>
       </section>
     </div>

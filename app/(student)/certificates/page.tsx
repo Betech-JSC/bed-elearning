@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Award, Download, Search } from "lucide-react"
+import Link from "next/link"
 
 export default async function CertificatesPage() {
   const session = await auth()
@@ -93,9 +94,11 @@ export default async function CertificatesPage() {
                   </div>
                 </div>
 
-                <Button className="w-full h-14 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-white font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 group-hover:bg-[#FF6600] transition-colors shadow-lg">
-                  <Download className="w-4 h-4" />
-                  Tải chứng chỉ
+                <Button asChild className="w-full h-14 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-white font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 group-hover:bg-[#FF6600] transition-colors shadow-lg">
+                  <Link href={`/certifications/${cert.certificateId}`}>
+                    <Download className="w-4 h-4" />
+                    Tải chứng chỉ
+                  </Link>
                 </Button>
               </div>
             </div>

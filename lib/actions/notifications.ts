@@ -231,3 +231,38 @@ export async function notifySystemAnnouncement(title: string, message: string, l
     return { success: false, error: error.message }
   }
 }
+
+/**
+ * 6. Fetch user notifications.
+ */
+export async function getNotifications() {
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
+    if (!userId) {
+      return { success: false, error: "Unauthorized", notifications: [] }
+    }
+
+    const notifications = await prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 20
+    })
+
+    return {
+      success: true,
+      notifications: notifications.map(n => ({
+        id: n.id,
+        title: n.title,
+        message: n.message,
+        isRead: n.isRead,
+        link: n.link,
+        createdAt: n.createdAt.toISOString()
+      }))
+    }
+  } catch (error: any) {
+    console.error("Error fetching notifications:", error)
+    return { success: false, error: error.message || "Failed to fetch notifications", notifications: [] }
+  }
+}
+

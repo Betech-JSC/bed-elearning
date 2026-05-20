@@ -84,6 +84,25 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
     ? course.reviews.reduce((acc, r) => acc + r.rating, 0) / course.reviews.length 
     : 5.0
 
+  const instructorStats = await prisma.course.findMany({
+    where: { instructorId: course.instructorId, status: "PUBLISHED" },
+    include: {
+      _count: { select: { enrollments: true } },
+      reviews: true
+    }
+  })
+  
+  const totalCourses = instructorStats.length
+  const totalInstructorStudents = instructorStats.reduce((acc, c) => acc + c._count.enrollments, 0)
+  const allReviews = instructorStats.flatMap(c => c.reviews)
+  const instructorRating = allReviews.length > 0 
+    ? allReviews.reduce((acc, r) => acc + r.rating, 0) / allReviews.length 
+    : 5.0
+
+  const isDiscounted = course.salePrice > 0 && course.salePrice < course.price
+  const currentPrice = isDiscounted ? course.salePrice : course.price
+  const discountPercent = isDiscounted ? Math.round((1 - course.salePrice / course.price) * 100) : 0
+
   return (
     <div className="bg-white min-h-screen pt-20">
       {/* HEADER SECTION */}
@@ -269,15 +288,15 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                         <div className="flex flex-wrap gap-8 text-[10px] font-black uppercase tracking-widest pt-4 border-t border-zinc-50">
                            <div className="flex items-center gap-3 text-zinc-400">
                               <BookOpen className="w-5 h-5 text-[#FF6600]" />
-                              <span className="text-zinc-900">12+ Khóa học</span>
+                              <span className="text-zinc-900">{totalCourses} Khóa học</span>
                            </div>
                            <div className="flex items-center gap-3 text-zinc-400">
                               <Star className="w-5 h-5 text-[#FF6600]" />
-                              <span className="text-zinc-900">4.9/5 Rating</span>
+                              <span className="text-zinc-900">{instructorRating.toFixed(1)}/5 Rating</span>
                            </div>
                            <div className="flex items-center gap-3 text-zinc-400">
                               <Users className="w-5 h-5 text-[#FF6600]" />
-                              <span className="text-zinc-900">2.5k+ Học viên</span>
+                              <span className="text-zinc-900">{totalInstructorStudents >= 1000 ? `${(totalInstructorStudents/1000).toFixed(1)}k+` : totalInstructorStudents} Học viên</span>
                            </div>
                         </div>
                         <Button asChild variant="outline" className="h-14 px-8 rounded-2xl border-zinc-200 font-black text-[10px] uppercase tracking-widest hover:bg-zinc-50 border-none bg-zinc-50">
@@ -310,14 +329,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                <div className="p-10 space-y-10">
                   <div className="space-y-2">
                      <div className="text-5xl font-black text-zinc-900 tracking-tighter">
-                        {course.price === 0 ? "Miễn phí" : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
+                        {currentPrice === 0 ? "Miễn phí" : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentPrice)}
                      </div>
-                     {course.price > 0 && (
+                     {isDiscounted && (
                         <div className="flex items-center gap-3">
                             <span className="text-zinc-400 line-through font-bold text-xl">
-                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price * 1.4)}
+                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
                             </span>
-                            <Badge className="bg-emerald-500 text-white border-none rounded-lg font-black text-[10px]">-30% OFF</Badge>
+                            <Badge className="bg-emerald-500 text-white border-none rounded-lg font-black text-[10px]">-{(discountPercent)}% OFF</Badge>
                         </div>
                      )}
                   </div>
@@ -326,7 +345,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     course={{
                       id: course.id,
                       title: course.title,
-                      price: course.price,
+                      price: currentPrice,
                       thumbnail: course.thumbnail,
                       slug: course.slug,
                       instructor: { name: course.instructor.name }
