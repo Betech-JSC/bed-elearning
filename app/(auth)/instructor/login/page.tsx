@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
 import { Lock, Mail, Star } from "lucide-react"
@@ -13,7 +12,6 @@ import Link from "next/link"
 import Image from "next/image"
 
 export default function InstructorLoginPage() {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -34,8 +32,7 @@ export default function InstructorLoginPage() {
       }
 
       toast.success("Đăng nhập giảng viên thành công.")
-      router.push("/instructor/dashboard")
-      router.refresh()
+      window.location.href = "/instructor/dashboard"
     } catch (err) {
       toast.error("Đã xảy ra lỗi.")
     } finally {

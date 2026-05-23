@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
 import { ShieldAlert, ArrowRight, Lock, User, Info } from "lucide-react"
@@ -10,7 +9,6 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 
 export default function AdminLoginPage() {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -31,8 +29,7 @@ export default function AdminLoginPage() {
       }
 
       toast.success("Admin access granted.")
-      router.push("/admin/dashboard")
-      router.refresh()
+      window.location.href = "/admin/dashboard"
     } catch (err) {
       toast.error("An error occurred during authentication.")
     } finally {
